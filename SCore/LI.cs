@@ -59,11 +59,11 @@ namespace SCore
                 output += Synapses[i].PreSynapticNeuron.LastOutput * Synapses[i].Weight;
             }
             
-            Solve.Deriv deriv = new Solve.Deriv(CoreFunc.LIDeriv_Tao_Sigma);
+            //Solve.Deriv deriv = new Solve.Deriv(CoreFunc.LIDeriv_Tao_Sigma);
             
-            var param = new double[] {tao, output};
-            Solve.RK4By_Del(deltaT, LastOutput, param,
-                            deriv);
+            //var param = new double[] {tao, output};
+            //Solve.RK4By_Del(deltaT, LastOutput, param,
+            //                deriv);
         }
 
     }

@@ -10,25 +10,9 @@
 // WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
 //--------------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SSolver;
+namespace SSolver
 
-namespace SCore
-{
-    public class ThresholdSigmoid : ThresholdHeaviside
-    {
-        public ThresholdSigmoid(double threshold) : base(threshold)
-        {
-        }
+open System
 
+type Deriv = delegate of seq<float> * float * float -> float
 
-        public override double Fire(double hilllockpotential)
-        {
-            return CoreFunc.Sigmoid(hilllockpotential - Threshold);
-        }
-
-    }
-}
