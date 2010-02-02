@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.Serialization;
 
 namespace SCore
 {
@@ -17,5 +18,8 @@ namespace SCore
         double DurationT { set; get; }
         double CurrentT { get; }
         void Run();
+        void StepRun();
+        bool IsRunning { get; }
+        bool IsRunOver { get; }
     }
 }

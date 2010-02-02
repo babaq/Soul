@@ -11,12 +11,16 @@ namespace SCore
         private double deltaT;
         private double durationT;
         private double currentT;
+        private bool isrunning;
+        private bool isrunover;
 
         public Network(double deltatime,double durationtime)
         {
             neuronlist = new Dictionary<int, INeuron>();
             deltaT = deltatime;
             durationT = durationtime;
+            isrunning = false;
+            isrunover = false;
         }
 
 
@@ -29,13 +33,19 @@ namespace SCore
 
         public void AddNeuron(INeuron neuron)
         {
-            neuronlist.Add(neuron.ID,neuron);
+            if(!neuronlist.ContainsKey(neuron.ID))
+            {
+                neuronlist.Add(neuron.ID, neuron);
+            }
             neuron.Network = this;
         }
 
         public void RemoveNeuron(INeuron neuron)
         {
-            neuronlist.Remove(neuron.ID);
+            if(neuronlist.ContainsKey(neuron.ID))
+            {
+                neuronlist.Remove(neuron.ID);
+            }
             neuron.Network = null;
         }
 
@@ -79,12 +89,41 @@ namespace SCore
 
         public void Run()
         {
+            isrunning = true;
             do
             {
                 Update();
                 Tick();
                 currentT += deltaT;
-            } while (currentT>durationT);
+            } while (currentT<=durationT);
+            isrunning = false;
+            isrunover = true;
+        }
+
+        public void StepRun()
+        {
+            if(currentT<=durationT)
+            {
+                isrunning = true;
+                Update();
+                Tick();
+                currentT += deltaT;
+            }
+            else
+            {
+                isrunning = false;
+                isrunover = true;
+            }
+        }
+
+        public bool IsRunning
+        {
+            get { return isrunning; }
+        }
+
+        public bool IsRunOver
+        {
+            get { return isrunover; }
         }
 
         #endregion

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SCore
 {
-    public class compartmentNeuron
+    public class HH
     {
     }
 }

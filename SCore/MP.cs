@@ -8,19 +8,26 @@ namespace SCore
     public class MP : INeuron
     {
         int id;
+        private string name;
         List<ISynapse> weightsynapselist;
         IHilllock axonhilllock;
         double axonpotential;
         double lastaxonpotential;
         INetwork network;
 
-        public MP(int neuronID, double threshold)
+        public MP(int neuronID, double threshold,double initpotentail)
+            : this(neuronID, new ThresholdHeaviside(threshold),initpotentail)
+        {
+        }
+
+        public MP(int neuronID, IHilllock hilllock,double initpotentail)
         {
             id = neuronID;
+            name = "NoName";
             weightsynapselist = new List<ISynapse>();
-            axonhilllock = new ThresholdHeaviside(threshold);
+            axonhilllock = hilllock;
             axonpotential = 0.0;
-            lastaxonpotential = 0.0;
+            lastaxonpotential = initpotentail;
             network = null;
         }
 
@@ -37,6 +44,12 @@ namespace SCore
             {
                 id = value;
             }
+        }
+
+        public string Name
+        {
+            get { return name; }
+            set { name = value; }
         }
 
         public List<ISynapse> SynapseList
@@ -77,10 +90,37 @@ namespace SCore
             axonpotential = 0.0;
         }
 
+        public void ConnectTo(INeuron targetneuron, ISynapse targetsynapse)
+        {
+            targetneuron.SynapseList.Add(targetsynapse);
+            this.network.AddNeuron(targetneuron);
+        }
+
+        public void ConnectFrom(INeuron sourceneuron, ISynapse selfsynapse)
+        {
+            this.SynapseList.Add(selfsynapse);
+            sourceneuron.Network.AddNeuron(this);
+        }
+
+        public void DisConnect(ISynapse selfsynapse)
+        {
+            this.SynapseList.Remove(selfsynapse);
+        }
+
         public INetwork Network
         {
             get { return network; }
             set { network = value; }
+        }
+
+        #endregion
+
+        #region ICloneable Members
+
+        public object Clone()
+        {
+            var clone = new MP(this.id,this.axonhilllock.Threshold,lastaxonpotential);
+            return clone;
         }
 
         #endregion

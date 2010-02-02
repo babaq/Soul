@@ -29,9 +29,9 @@ namespace SCore
             }
         }
 
-        public double Fire(double membranepotential)
+        public double Fire(double hilllockpotential)
         {
-            if (membranepotential-threshold<0)
+            if (hilllockpotential-threshold<0)
             {
                 return 0.0;
             }

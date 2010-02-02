@@ -8,6 +8,6 @@ namespace SCore
     public interface IHilllock
     {
         double Threshold { set; get; }
-        double Fire(double membranepotential);
+        double Fire(double hilllockpotential);
     }
 }
