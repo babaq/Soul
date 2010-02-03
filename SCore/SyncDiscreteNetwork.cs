@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SCore
 {
-    public class Network : INetwork
+    public class SyncDiscreteNetwork : INetwork
     {
         private Dictionary<int, INeuron> neuronlist;
         private double deltaT;
@@ -14,7 +14,7 @@ namespace SCore
         private bool isrunning;
         private bool isrunover;
 
-        public Network(double deltatime,double durationtime)
+        public SyncDiscreteNetwork(double deltatime,double durationtime)
         {
             neuronlist = new Dictionary<int, INeuron>();
             deltaT = deltatime;

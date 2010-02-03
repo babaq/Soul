@@ -29,7 +29,7 @@ namespace SCore
             }
         }
 
-        public double Fire(double hilllockpotential)
+        public virtual double Fire(double hilllockpotential)
         {
             if (hilllockpotential-threshold<0)
             {

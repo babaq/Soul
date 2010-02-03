@@ -11,7 +11,7 @@ namespace SCore
         {
         }
 
-        public double Fire(double hilllockpotential)
+        public override double Fire(double hilllockpotential)
         {
             var output = 1.0/(1.0 + Math.Exp(-(hilllockpotential - Threshold)));
             return output;
