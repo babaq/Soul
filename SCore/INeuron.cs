@@ -1,23 +1,38 @@
-﻿using System;
+﻿//--------------------------------------------------------------------------------
+// This file is part of The Soul, A Neural Network Simulation System.
+//
+// Copyright © 2010 LBE Group. All rights reserved.
+//
+// For information about this application and licensing, go to http://soul.codeplex.com
+//
+// THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
+// EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED
+// WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
+//--------------------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Media.Media3D;
 
 namespace SCore
 {
     public interface INeuron : ICloneable
     {
-        int ID { set; get; }
+        Guid ID { get; }
         string Name { set; get; }
-        List<ISynapse> SynapseList { get; }
-        IHilllock AxonHilllock { set; get; }
-        double AxonPotential { get; }
-        double LastAxonPotential { get; }
-        void Update();
+        Point3D Position { set; get; }
+        List<ISynapse> Synapses { get; }
+        IHilllock Hilllock { set; get; }
+        double Output { get; }
+        double LastOutput { get; }
+        void Update(double deltaT);
         void Tick();
-        void ConnectTo(INeuron targetneuron,ISynapse targetsynapse);
-        void ConnectFrom(INeuron sourceneuron,ISynapse selfsynapse);
+        void ProjectTo(INeuron targetneuron,ISynapse targetsynapse);
+        void ProjectedFrom(INeuron sourceneuron,ISynapse selfsynapse);
         void DisConnect(ISynapse selfsynapse);
-        INetwork Network { get; set; }
+        IPopulation Population { get; set; }
+        double Tao { get; set; }
     }
 }

@@ -8,19 +8,19 @@ namespace SCoreTest01
 {
     class Program
     {
-        private static SyncDiscreteNetwork testnet;
+        private static Population testnet;
 
         static void Init()
         {
             Console.WriteLine("Init Neural Network . . .\n");
-            testnet = new SyncDiscreteNetwork(0.5, 20);
-            var mp0 = new MP(0, new ThresholdSigmoid(0.3),0.5);
+            testnet = new Population(0.5, 20);
+            var mp0 = new MP(0.3,0.5);
             testnet.AddNeuron(mp0);
-            var mp1 = new MP(1, new ThresholdSigmoid(0.5), 0.2);
-            mp0.ConnectTo(mp1, new WeightSynapse(mp1.ID, 0.1));
-            mp0.ConnectFrom(mp1, new WeightSynapse(mp0.ID, 0.6));
-            mp0.ConnectTo(mp0,new WeightSynapse(mp0.ID,0.7));
-            mp1.ConnectTo(mp1,new WeightSynapse(mp1.ID,0.2));
+            var mp1 = new MP(0.5, 0.2);
+            mp0.ProjectTo(mp1, new WeightSynapse(mp1.ID, 0.1));
+            mp0.ProjectedFrom(mp1, new WeightSynapse(mp0.ID, 0.6));
+            mp0.ProjectTo(mp0,new WeightSynapse(mp0.ID,0.7));
+            mp1.ProjectTo(mp1,new WeightSynapse(mp1.ID,0.2));
             Console.WriteLine("Init Done. Ready for Simulation.\n");
         }
 
@@ -44,8 +44,8 @@ namespace SCoreTest01
                         {
                             testnet.StepRun();
                             Console.WriteLine("Run Step Time: "+testnet.CurrentT);
-                            Console.WriteLine("mp0 state: "+testnet.NeuronList[0].LastAxonPotential.ToString("F2"));
-                            Console.WriteLine("mp1 state: " + testnet.NeuronList[1].LastAxonPotential.ToString("F2"));
+                            Console.WriteLine("mp0 state: "+testnet.Neurons.Values.ElementAt(0).LastOutput.ToString("F2"));
+                            Console.WriteLine("mp1 state: " + testnet.Neurons.Values.ElementAt(1).LastOutput.ToString("F2"));
                             Console.ReadLine();
                         } while (!testnet.IsRunOver);
                         Console.WriteLine("Simulation Done !\n");

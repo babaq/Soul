@@ -1,49 +1,60 @@
-﻿using System;
+﻿//--------------------------------------------------------------------------------
+// This file is part of The Soul, A Neural Network Simulation System.
+//
+// Copyright © 2010 LBE Group. All rights reserved.
+//
+// For information about this application and licensing, go to http://soul.codeplex.com
+//
+// THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
+// EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED
+// WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
+//--------------------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Media.Media3D;
 
 namespace SCore
 {
+    /// <summary>
+    /// McCulloch-Pitts Model
+    /// </summary>
     public class MP : INeuron
     {
-        int id;
+        private Guid id;
         private string name;
-        List<ISynapse> weightsynapselist;
-        IHilllock axonhilllock;
-        double axonpotential;
-        double lastaxonpotential;
-        INetwork network;
+        private Point3D position;
+        private List<ISynapse> weightsynapses;
+        private IHilllock hilllock;
+        private double output;
+        private double lastoutput;
+        private IPopulation population;
 
-        public MP(int neuronID, double threshold,double initpotentail)
-            : this(neuronID, new ThresholdHeaviside(threshold),initpotentail)
+        public MP(double threshold,double initoutput)
+            : this(new Point3D(0.0,0.0,0.0), new ThresholdHeaviside(threshold),initoutput)
         {
         }
 
-        public MP(int neuronID, IHilllock hilllock,double initpotentail)
+        public MP(Point3D position, IHilllock hilllock,double initoutput)
         {
-            id = neuronID;
-            name = "NoName";
-            weightsynapselist = new List<ISynapse>();
-            axonhilllock = hilllock;
-            axonpotential = 0.0;
-            lastaxonpotential = initpotentail;
-            network = null;
+            id = Guid.NewGuid();
+            name = "MP";
+            this.position = position;
+            weightsynapses = new List<ISynapse>();
+            this.hilllock = hilllock;
+            output = 0.0;
+            lastoutput = initoutput;
+            population =null;
         }
 
 
         #region INeuron Members
 
-        public int ID
+        public Guid ID
         {
-            get
-            {
-                return id;
-            }
-            set
-            {
-                id = value;
-            }
+            get { return id; }
         }
 
         public string Name
@@ -52,65 +63,119 @@ namespace SCore
             set { name = value; }
         }
 
-        public List<ISynapse> SynapseList
+        public Point3D Position
         {
-            get { return weightsynapselist; }
+            get { return position; }
+            set { position = value; }
         }
 
-        public IHilllock AxonHilllock
+        public List<ISynapse> Synapses
         {
-            get { return axonhilllock; }
-            set { axonhilllock = value; }
+            get { return weightsynapses; }
         }
 
-        public double AxonPotential
+        public IHilllock Hilllock
         {
-            get { return axonpotential; }
+            get { return hilllock; }
+            set { hilllock = value; }
         }
 
-        public double LastAxonPotential
+        public double Output
         {
-            get { return lastaxonpotential; }
+            get { return output; }
         }
 
-        public void Update()
+        public double LastOutput
         {
-            for (int i = 0; i < weightsynapselist.Count; i++)
+            get { return lastoutput; }
+        }
+
+        public virtual void Update(double deltaT)
+        {
+            for (int i = 0; i < weightsynapses.Count; i++)
             {
-                axonpotential += network.GetLastAxonPotential(weightsynapselist[i].PreSynapticID)*weightsynapselist[i].Weight;
+                output += weightsynapses[i].PreSynapticNeuron.LastOutput*weightsynapses[i].Weight;
             }
 
-            axonpotential = axonhilllock.Fire(axonpotential);
-
+            output = hilllock.Fire(output);
         }
 
         public void Tick()
         {
-            lastaxonpotential = axonpotential;
-            axonpotential = 0.0;
+            lastoutput = output;
+            output = 0.0;
         }
 
-        public void ConnectTo(INeuron targetneuron, ISynapse targetsynapse)
+        public void ProjectTo(INeuron targetneuron, ISynapse targetsynapse)
         {
-            targetneuron.SynapseList.Add(targetsynapse);
-            this.network.AddNeuron(targetneuron);
+            targetneuron.Synapses.Add(targetsynapse);
+            if (targetneuron.Population==null && this.population!=null)
+            {
+                targetneuron.Population=this.population;
+                return;
+            }
+            if (targetneuron.Population != null && this.population== null)
+            {
+                this.population = targetneuron.Population;
+                return;
+            }
         }
 
-        public void ConnectFrom(INeuron sourceneuron, ISynapse selfsynapse)
+        public void ProjectedFrom(INeuron sourceneuron, ISynapse selfsynapse)
         {
-            this.SynapseList.Add(selfsynapse);
-            sourceneuron.Network.AddNeuron(this);
+            this.Synapses.Add(selfsynapse);
+            if (sourceneuron.Population == null && this.population!= null)
+            {
+                sourceneuron.Population = this.population;
+                return;
+            }
+            if (sourceneuron.Population != null && this.population == null)
+            {
+                this.population = sourceneuron.Population;
+                return;
+            }
         }
 
         public void DisConnect(ISynapse selfsynapse)
         {
-            this.SynapseList.Remove(selfsynapse);
+            if (Synapses.Contains(selfsynapse))
+                Synapses.Remove(selfsynapse);
         }
 
-        public INetwork Network
+        public IPopulation Population
         {
-            get { return network; }
-            set { network = value; }
+            get { return population; }
+            set
+            {
+                if (value == null)
+                {
+                    if (population != null)
+                    {
+                        population.Neurons.Remove(this.id);
+                        population = value;
+                    }
+                }
+                else
+                {
+                    if (population == null)
+                    {
+                        population = value;
+                        population.Neurons.Add(this.id, this);
+                    }
+                    else
+                    {
+                        population.Neurons.Remove(this.id);
+                        population = value;
+                        population.Neurons.Add(this.id, this);
+                    }
+                }
+            }
+        }
+
+        public virtual double Tao
+        {
+            get { return 0.0; }
+            set {}
         }
 
         #endregion
@@ -119,7 +184,7 @@ namespace SCore
 
         public object Clone()
         {
-            var clone = new MP(this.id,this.axonhilllock.Threshold,lastaxonpotential);
+            var clone = new MP(this.position, this.hilllock, lastoutput);
             return clone;
         }
 

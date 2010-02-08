@@ -32,6 +32,9 @@
     <DocumentationFile>bin\Release\SCore.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -55,15 +58,25 @@
     <Compile Include="IF.cs" />
     <Compile Include="IHilllock.cs" />
     <Compile Include="INetwork.cs" />
+    <Compile Include="IPopulation.cs" />
     <Compile Include="INeuron.cs" />
+    <Compile Include="ISimulator.cs" />
     <Compile Include="ISynapse.cs" />
     <Compile Include="LI.cs" />
     <Compile Include="MP.cs" />
-    <Compile Include="SyncDiscreteNetwork.cs" />
+    <Compile Include="Network.cs" />
+    <Compile Include="Population.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Simulator.cs" />
     <Compile Include="ThresholdHeaviside.cs" />
     <Compile Include="ThresholdSigmoid.cs" />
     <Compile Include="WeightSynapse.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SSolver\SSolver.fsproj">
+      <Project>{9E5F403B-6782-4E92-9381-224A9FA2E50A}</Project>
+      <Name>SSolver</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
