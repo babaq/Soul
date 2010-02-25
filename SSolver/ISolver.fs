@@ -10,24 +10,18 @@
 // WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
 //--------------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SSolver;
+namespace SSolver
 
-namespace SCore
-{
-    public interface ISimulator
-    {
-        INetwork Network { get; set; }
-        ISolver Solver { get; set; }
-        double DeltaT { set; get; }
-        double DurationT { set; get; }
-        double CurrentT { get; }
-        void Run();
-        void Step(double delta);
-        bool IsRunning { get; }
-        bool IsRunOver { get; }
-    }
-}
+open System
+
+/// <summary>
+/// Derivative Function Delegate
+/// </summary>
+type Derivative = delegate of seq<float> * float * float -> float
+
+/// <summary>
+/// Solver Interface
+/// </summary>
+type ISolver = 
+    abstract Settings: int with get,set
+    abstract Solve: float * float * float * seq<float> * Derivative -> float

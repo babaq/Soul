@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
+using SSolver;
 
 namespace SCore
 {
@@ -98,11 +99,11 @@ namespace SCore
             get { return new Dictionary<Guid, INetwork>();}
         }
 
-        public void Update(double deltaT)
+        public void Update(double deltaT,double currentT,ISolver solver)
         {
             for (int i = 0; i < neurons.Count; i++)
             {
-                neurons.ElementAt(i).Value.Update(deltaT);
+                neurons.ElementAt(i).Value.Update(deltaT,currentT, solver);
             }
         }
 

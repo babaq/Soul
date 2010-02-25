@@ -68,6 +68,7 @@
     <Compile Include="Population.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Simulator.cs" />
+    <Compile Include="ThresholdFire.cs" />
     <Compile Include="ThresholdHeaviside.cs" />
     <Compile Include="ThresholdSigmoid.cs" />
     <Compile Include="WeightSynapse.cs" />

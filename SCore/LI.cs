@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
+using SSolver;
 
 namespace SCore
 {
@@ -27,15 +28,15 @@ namespace SCore
 
 
         public LI(double threshold, double initoutput, double tao)
-            : base(new Point3D(0.0, 0.0, 0.0), new ThresholdSigmoid(threshold), initoutput)
+            : this(new Point3D(0.0, 0.0, 0.0), new ThresholdSigmoid(threshold), initoutput, tao)
         {
-            this.tao = tao;
         }
 
         public LI(Point3D position, IHilllock hilllock, double initoutput, double tao)
             : base(position, hilllock, initoutput)
         {
             this.tao = tao;
+            DynamicRule = CoreFunc.dLI;
         }
 
 
@@ -51,19 +52,15 @@ namespace SCore
             }
         }
 
-        public override void Update(double deltaT)
+        public override void Update(double deltaT,double currentT,ISolver solver)
         {
-            var output = 0.0;
             for (int i = 0; i < Synapses.Count; i++)
             {
-                output += Synapses[i].PreSynapticNeuron.LastOutput * Synapses[i].Weight;
+                Output += Synapses[i].PreSynapticNeuron.LastOutput * Synapses[i].Weight;
             }
-            
-            //Solve.Deriv deriv = new Solve.Deriv(CoreFunc.LIDeriv_Tao_Sigma);
-            
-            //var param = new double[] {tao, output};
-            //Solve.RK4By_Del(deltaT, LastOutput, param,
-            //                deriv);
+            var dynamicruleparam = new double[] {tao, Output};
+            Output = solver.Solve(deltaT, currentT, LastOutput, dynamicruleparam, DynamicRule);
+            Output = Hilllock.Fire(Output);
         }
 
     }

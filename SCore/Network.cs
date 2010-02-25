@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
+using SSolver;
 
 namespace SCore
 {
@@ -104,11 +105,11 @@ namespace SCore
             }
         }
 
-        public void Update(double deltaT)
+        public void Update(double deltaT,double currentT,ISolver solver)
         {
             for(int i=0;i<subnetworks.Count;i++)
             {
-                subnetworks.ElementAt(i).Value.Update(deltaT);
+                subnetworks.ElementAt(i).Value.Update(deltaT,currentT, solver);
             }
         }
 

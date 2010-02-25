@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
+using SSolver;
 
 namespace SCore
 {
@@ -25,14 +26,15 @@ namespace SCore
         Point3D Position { set; get; }
         List<ISynapse> Synapses { get; }
         IHilllock Hilllock { set; get; }
-        double Output { get; }
-        double LastOutput { get; }
-        void Update(double deltaT);
+        double Output { get; set; }
+        double LastOutput { get; set; }
+        void Update(double deltaT,double currentT,ISolver solver);
         void Tick();
         void ProjectTo(INeuron targetneuron,ISynapse targetsynapse);
         void ProjectedFrom(INeuron sourceneuron,ISynapse selfsynapse);
         void DisConnect(ISynapse selfsynapse);
         IPopulation Population { get; set; }
         double Tao { get; set; }
+        Derivative DynamicRule { get; set; }
     }
 }

@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
+using SSolver;
 
 namespace SCore
 {
@@ -31,6 +32,7 @@ namespace SCore
         private double output;
         private double lastoutput;
         private IPopulation population;
+        private Derivative dynamicrule;
 
         public MP(double threshold,double initoutput)
             : this(new Point3D(0.0,0.0,0.0), new ThresholdHeaviside(threshold),initoutput)
@@ -47,6 +49,7 @@ namespace SCore
             output = 0.0;
             lastoutput = initoutput;
             population =null;
+            dynamicrule = null;
         }
 
 
@@ -83,14 +86,16 @@ namespace SCore
         public double Output
         {
             get { return output; }
+            set { output = value; }
         }
 
         public double LastOutput
         {
             get { return lastoutput; }
+            set { lastoutput = value; }
         }
 
-        public virtual void Update(double deltaT)
+        public virtual void Update(double deltaT,double currentT,ISolver solver)
         {
             for (int i = 0; i < weightsynapses.Count; i++)
             {
@@ -176,6 +181,12 @@ namespace SCore
         {
             get { return 0.0; }
             set {}
+        }
+
+        public Derivative DynamicRule
+        {
+            get { return dynamicrule; }
+            set { dynamicrule = value; }
         }
 
         #endregion

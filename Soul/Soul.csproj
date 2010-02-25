@@ -91,6 +91,16 @@
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SCore\SCore.csproj">
+      <Project>{724A3767-D5DB-48FC-9CBE-1D7B784AA198}</Project>
+      <Name>SCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SSolver\SSolver.fsproj">
+      <Project>{9E5F403B-6782-4E92-9381-224A9FA2E50A}</Project>
+      <Name>SSolver</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

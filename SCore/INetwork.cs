@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
+using SSolver;
 
 namespace SCore
 {
@@ -25,7 +26,7 @@ namespace SCore
         Point3D Position { set; get; }
         Dictionary<Guid,INetwork> SubNetworks { get; }
         INetwork ParentNetwork { get; set; }
-        void Update(double deltaT);
+        void Update(double deltaT,double currentT,ISolver solver);
         void Tick();
     }
 }

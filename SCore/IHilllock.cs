@@ -21,5 +21,7 @@ namespace SCore
     {
         double Threshold { set; get; }
         double Fire(double hilllockpotential);
+        double ResetPotential { set; get; }
+        double RefractoryPeriod { set; get; }
     }
 }

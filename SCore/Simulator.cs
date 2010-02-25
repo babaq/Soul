@@ -14,26 +14,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SSolver;
 
 namespace SCore
 {
     public class Simulator : ISimulator
     {
+        private double t0;
         private double deltaT;
         private double durationT;
         private double currentT;
         private bool isrunning;
         private bool isrunover;
         private INetwork network;
+        private ISolver solver;
 
-        public Simulator(double deltatime, double durationtime,INetwork targetnetwork)
+        public Simulator(double deltatime, double durationtime,INetwork targetnetwork,ISolver solver)
         {
             deltaT = deltatime;
             durationT = durationtime;
             currentT = 0.0;
+            t0 = currentT;
             isrunning = false;
             isrunover = false;
             network = targetnetwork;
+            this.solver = solver;
         }
 
 
@@ -43,6 +48,12 @@ namespace SCore
         {
             get { return network; }
             set { network = value; }
+        }
+
+        public ISolver Solver
+        {
+            get { return solver; }
+            set { solver = value; }
         }
 
         public double DeltaT
@@ -76,37 +87,30 @@ namespace SCore
 
         public void Run()
         {
-            if (network != null)
+            if (network != null && solver != null)
             {
                 isrunning = true;
                 do
                 {
-                    network.Update(deltaT);
-                    network.Tick();
-                    currentT += deltaT;
-                } while (currentT <= durationT);
+                    Step();
+                } while (currentT -t0<= durationT);
+                t0 = currentT;
                 isrunning = false;
                 isrunover = true;
             }
         }
 
-        public void StepRun()
+        public void Step()
         {
-            if (network != null)
-            {
-                if (currentT <= durationT)
-                {
-                    isrunning = true;
-                    network.Update(deltaT);
-                    network.Tick();
-                    currentT += deltaT;
-                }
-                else
-                {
-                    isrunning = false;
-                    isrunover = true;
-                }
-            }
+            Step(deltaT);
+        }
+
+        public void Step(double delta)
+        {
+            //record
+            network.Update(delta,currentT, solver);
+            network.Tick();
+            currentT += delta;
         }
 
         public bool IsRunning

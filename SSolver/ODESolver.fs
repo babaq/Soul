@@ -13,6 +13,15 @@
 namespace SSolver
 
 open System
+open CoreFunc
 
-type Deriv = delegate of seq<float> * float * float -> float
+/// <summary>
+/// Basic Ordinary Differential Equation Solver
+/// </summary>
+type ODESolver =
+    val mutable settings: int
+    new() = { settings = 0 }
+    interface ISolver with
+        member s.Settings with get() = s.settings and set(v) = s.settings <- v
+        member s.Solve(h, t, y, y'_param, y'_delegate) = dDRK4 h t y y'_param y'_delegate
 

@@ -14,51 +14,50 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using SSolver;
 
 namespace SCore
 {
-    public class ThresholdHeaviside : IHilllock
+    public class ThresholdFire : ThresholdSigmoid
     {
-        private double threshold;
+        private double resetpotential;
+        private double refractoryperiod;
 
-        public ThresholdHeaviside(double threshold)
+
+        public ThresholdFire(double threshold, double resetpotential, double refractoryperiod)
+            : base(threshold)
         {
-            this.threshold = threshold;
+            this.resetpotential = resetpotential;
+            this.refractoryperiod = refractoryperiod;
         }
 
 
-        #region IHilllock Members
+        public override double Fire(double hilllockpotential)
+        {
+        }
 
-        public double Threshold
+        public override double ResetPotential
         {
             get
             {
-                return threshold;
+                return resetpotential;
             }
             set
             {
-                threshold = value;
+                resetpotential = value;
             }
         }
 
-        public virtual double Fire(double hilllockpotential)
+        public override double RefractoryPeriod
         {
-            return CoreFunc.Heaviside(hilllockpotential - threshold);
+            get
+            {
+                return refractoryperiod;
+            }
+            set
+            {
+                refractoryperiod = value;
+            }
         }
 
-        public virtual double ResetPotential
-        {
-            get { return -65.0; }
-            set {}
-        }
-
-        public virtual double RefractoryPeriod
-        {
-            get { return 1.5; }
-            set {}
-        }
-
-        #endregion
     }
 }
