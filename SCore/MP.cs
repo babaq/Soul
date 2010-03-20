@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
@@ -28,24 +29,27 @@ namespace SCore
         private string name;
         private Point3D position;
         private List<ISynapse> weightsynapses;
-        private IHilllock hilllock;
+        private IHillock hillock;
         private double output;
         private double lastoutput;
         private IPopulation population;
         private Derivative dynamicrule;
+        public event EventHandler Updated;
+
 
         public MP(double threshold,double initoutput)
-            : this(new Point3D(0.0,0.0,0.0), new ThresholdHeaviside(threshold),initoutput)
+            : this(new Point3D(0.0,0.0,0.0), new ThresholdHeaviside(null, threshold),initoutput)
         {
         }
 
-        public MP(Point3D position, IHilllock hilllock,double initoutput)
+        public MP(Point3D position, IHillock hilllock,double initoutput)
         {
             id = Guid.NewGuid();
             name = "MP";
             this.position = position;
             weightsynapses = new List<ISynapse>();
-            this.hilllock = hilllock;
+            this.hillock = hilllock;
+            this.hillock.HostNeuron = this;
             output = 0.0;
             lastoutput = initoutput;
             population =null;
@@ -77,10 +81,10 @@ namespace SCore
             get { return weightsynapses; }
         }
 
-        public IHilllock Hilllock
+        public IHillock Hillock
         {
-            get { return hilllock; }
-            set { hilllock = value; }
+            get { return hillock; }
+            set { hillock = value; }
         }
 
         public double Output
@@ -102,7 +106,8 @@ namespace SCore
                 output += weightsynapses[i].PreSynapticNeuron.LastOutput*weightsynapses[i].Weight;
             }
 
-            output = hilllock.Fire(output);
+            output = hillock.Fire(output,currentT);
+            OnUpdated();
         }
 
         public void Tick()
@@ -183,19 +188,65 @@ namespace SCore
             set {}
         }
 
+        public virtual double R
+        {
+            get { return 0.0; }
+            set {}
+        }
+
+        public virtual double RestPotential
+        {
+            get { return -65.0; }
+            set {}
+        }
+
         public Derivative DynamicRule
         {
             get { return dynamicrule; }
             set { dynamicrule = value; }
         }
 
+        protected void OnUpdated()
+        {
+            if(Updated!=null)
+            {
+                Updated(this, EventArgs.Empty);
+            }
+        }
+
+        public virtual void RegisterUpdated(EventHandler recordpotential)
+        {
+            Updated += recordpotential;
+        }
+
+        public virtual void RegisterSpike(EventHandler recordspike)
+        {
+        }
+
+        public virtual void UnRegisterUpdated(EventHandler recordpotential)
+        {
+            Updated -= recordpotential;
+        }
+
+        public virtual void UnRegisterSpike(EventHandler recordspike)
+        {
+        }
+
+        public void RecordStep(StreamWriter potentialwriter, RecordType recordtype,double currentT)
+        {
+            if (recordtype == RecordType.All && recordtype == RecordType.Potential)
+            {
+                potentialwriter.WriteLine(currentT.ToString("F3") + "," + Output.ToString("F3") + "," + ID.ToString("N"));
+            }
+        }
+
         #endregion
 
         #region ICloneable Members
 
-        public object Clone()
+        public virtual object Clone()
         {
-            var clone = new MP(this.position, this.hilllock, lastoutput);
+            var clone = new MP(this.position, this.hillock, lastoutput);
             return clone;
         }
 

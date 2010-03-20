@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
@@ -28,5 +29,10 @@ namespace SCore
         INetwork ParentNetwork { get; set; }
         void Update(double deltaT,double currentT,ISolver solver);
         void Tick();
+        void RegisterUpdated(EventHandler recordpotential);
+        void RegisterSpike(EventHandler recordspike);
+        void UnRegisterUpdated(EventHandler recordpotential);
+        void UnRegisterSpike(EventHandler recordspike);
+        void RecordStep(StreamWriter potentialwriter, RecordType recordtype,double currentT);
     }
 }

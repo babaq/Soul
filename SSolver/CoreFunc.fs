@@ -24,10 +24,34 @@ let Heaviside x =
         1.0
 
 /// <summary>
+/// General Sigmoid Function
+/// </summary>
+let gSigmoid (x: float) slope shift=
+    1.0 / ( 1.0 + exp( shift - (x/slope) ) )
+
+/// <summary>
 /// Sigmoid Function
 /// </summary>
 let Sigmoid x =
-    1.0 / ( 1.0 + exp( -x ) )
+    gSigmoid x 1.0 0.0
+
+/// <summary>
+/// Dirac Delta Function
+/// </summary>
+let DiracDelta x =
+    if x=0.0 then
+        1.0
+    else
+        0.0
+
+/// <summary>
+/// Range Dirac Delta Function
+/// </summary>
+let rDiracDelta (x: float) delta =
+    if x>(-delta/2.0) && x<=(delta/2.0) then
+        1.0
+    else
+        0.0
 
 /// <summary>
 /// Sigma Function
@@ -42,16 +66,28 @@ let Prod (x : seq<float>) (y : seq<float>) =
     Seq.map2 (fun a b -> a*b) x y
 
 /// <summary>
-/// Dynamic Rule Of Leaky Integrator Model
-/// </summary>
-let LI tao u w v =
-    ( -u + Sigma(Prod w v) ) / tao
-
-/// <summary>
 /// Dynamic Rule Of Leaky Integrator Model In Derivative Function
 /// </summary>
-let dLI (tao_sigma : seq<float>) t u =
-    ( -u + Seq.nth 1 tao_sigma ) / (Seq.nth 0 tao_sigma)
+let LI tao u e w v =
+    ( e - u + Sigma(Prod w v) ) / tao
+
+/// <summary>
+/// Dynamic Rule Of Leaky Integrator Model In Derivative Function Delegate
+/// </summary>
+let dLI (tao_e_sigma : seq<float>) t u =
+    ( Seq.nth 1 tao_e_sigma - u + Seq.nth 2 tao_e_sigma ) / (Seq.nth 0 tao_e_sigma)
+
+/// <summary>
+/// Dynamic Rule Of Integrate-and-Fire Model In Derivative Function
+/// </summary>
+let IF tao r u e w d =
+    ( (e-u) / tao ) + ( r * Sigma(Prod w d) )
+
+/// <summary>
+/// Dynamic Rule Of Integrate-and-Fire Model In Derivative Function Delegate
+/// </summary>
+let dIF (tao_r_e_sigma : seq<float>) t u =
+    ( (Seq.nth 2 tao_r_e_sigma - u) / Seq.nth 0 tao_r_e_sigma ) + Seq.nth 1 tao_r_e_sigma * Seq.nth 3 tao_r_e_sigma
 
 /// <summary>
 /// Euler Method
@@ -68,7 +104,7 @@ let dEuler (h : float) t y y'_param (y' : seq<float> -> float -> float -> float)
 /// <summary>
 /// Euler Method With Derivative Function Delegate
 /// </summary>
-let dDEuler (h : float) t y y'_param (y'_delegate : Derivative) =
+let ddEuler (h : float) t y y'_param (y'_delegate : Derivative) =
     let y' y'_param t y = y'_delegate.Invoke(y'_param, t, y)
     dEuler h t y y'_param y'
 
@@ -91,7 +127,7 @@ let dRK4 h t y y'_param (y' : seq<float> -> float -> float -> float) =
 /// <summary>
 /// Fourth Order Runge-Kutta Method With Derivative Function Delegate
 /// </summary>
-let dDRK4 h t y y'_param (y'_delegate : Derivative) =
+let ddRK4 h t y y'_param (y'_delegate : Derivative) =
     let y' y'_param t y = y'_delegate.Invoke(y'_param, t, y)
     dRK4 h t y y'_param y'
     

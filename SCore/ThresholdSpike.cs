@@ -14,25 +14,45 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SSolver;
 
 namespace SCore
 {
-    public class ThresholdFire : ThresholdSigmoid
+    public class ThresholdSpike : ThresholdSigmoid
     {
         private double resetpotential;
         private double refractoryperiod;
+        private Queue<double> travalingspiketrain=new Queue<double>();
 
 
-        public ThresholdFire(double threshold, double resetpotential, double refractoryperiod)
-            : base(threshold)
+        public ThresholdSpike(double threshold, double resetpotential, double refractoryperiod)
+            : base(null, threshold)
         {
             this.resetpotential = resetpotential;
             this.refractoryperiod = refractoryperiod;
         }
 
 
-        public override double Fire(double hilllockpotential)
+        public override double Fire(double hillockpotential, double currentT)
         {
+            if (CoreFunc.Heaviside(hillockpotential-Threshold)==0)
+            {
+                return hillockpotential;
+            }
+            else
+            {
+                travalingspiketrain.Enqueue(currentT);
+                FireSpike();
+                return resetpotential;
+            }
+        }
+
+        public override void CheckTravalingSpike(double currentT)
+        {
+            if(currentT-travalingspiketrain.Peek()>20.0)
+            {
+                travalingspiketrain.Dequeue();
+            }
         }
 
         public override double ResetPotential
@@ -57,6 +77,24 @@ namespace SCore
             {
                 refractoryperiod = value;
             }
+        }
+
+        public override Queue<double > TravalingSpikeTime
+        {
+            get { return travalingspiketrain; }
+        }
+
+        public override bool IsInRefractoryPeriod(double currentT)
+        {
+            if (travalingspiketrain.Count == 0)
+            {
+                return false;
+            }
+            if (currentT - travalingspiketrain.Last() > refractoryperiod)
+            {
+                return false;
+            }
+            return true;
         }
 
     }

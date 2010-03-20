@@ -25,17 +25,19 @@ namespace SCore
     public class LI : MP
     {
         private double tao;
+        private double restpotential;
 
 
         public LI(double threshold, double initoutput, double tao)
-            : this(new Point3D(0.0, 0.0, 0.0), new ThresholdSigmoid(threshold), initoutput, tao)
+            : this(new Point3D(0.0, 0.0, 0.0), new ThresholdSigmoid(null, threshold), initoutput, tao,-65.0)
         {
         }
 
-        public LI(Point3D position, IHilllock hilllock, double initoutput, double tao)
-            : base(position, hilllock, initoutput)
+        public LI(Point3D position, IHillock hillock, double initoutput, double tao, double restpotentail)
+            : base(position, hillock, initoutput)
         {
             this.tao = tao;
+            this.restpotential = restpotentail;
             DynamicRule = CoreFunc.dLI;
         }
 
@@ -52,15 +54,28 @@ namespace SCore
             }
         }
 
+        public override double RestPotential
+        {
+            get
+            {
+                return restpotential;
+            }
+            set
+            {
+                restpotential = value;
+            }
+        }
+
         public override void Update(double deltaT,double currentT,ISolver solver)
         {
             for (int i = 0; i < Synapses.Count; i++)
             {
                 Output += Synapses[i].PreSynapticNeuron.LastOutput * Synapses[i].Weight;
             }
-            var dynamicruleparam = new double[] {tao, Output};
+            var dynamicruleparam = new double[] {tao,RestPotential, Output};
             Output = solver.Solve(deltaT, currentT, LastOutput, dynamicruleparam, DynamicRule);
-            Output = Hilllock.Fire(Output);
+            Output = Hillock.Fire(Output,currentT);
+            OnUpdated();
         }
 
     }

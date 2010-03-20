@@ -11,6 +11,7 @@
 //--------------------------------------------------------------------------------
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,5 +30,25 @@ namespace SCore
         void Step(double delta);
         bool IsRunning { get; }
         bool IsRunOver { get; }
+        RecordType RecordType { get; set; }
+        string RecordFile { get; set; }
+        void BeginRecord();
+        void EndRecord();
+        void RecordPotential(object sender, EventArgs e);
+        void RecordSpike(object sender, EventArgs e);
+        void RegisterUpdated(EventHandler recordpotential);
+        void RegisterSpike(EventHandler recordspike);
+        void UnRegisterUpdated(EventHandler recordpotential);
+        void UnRegisterSpike(EventHandler recordspike);
+        void RecordStep(StreamWriter potentialwriter, RecordType recordtype,double currentT);
     }
+
+    public enum RecordType
+    {
+        None,
+        All,
+        Potential,
+        Spike
+    }
+
 }

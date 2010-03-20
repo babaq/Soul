@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
@@ -25,7 +26,7 @@ namespace SCore
         string Name { set; get; }
         Point3D Position { set; get; }
         List<ISynapse> Synapses { get; }
-        IHilllock Hilllock { set; get; }
+        IHillock Hillock { set; get; }
         double Output { get; set; }
         double LastOutput { get; set; }
         void Update(double deltaT,double currentT,ISolver solver);
@@ -35,6 +36,14 @@ namespace SCore
         void DisConnect(ISynapse selfsynapse);
         IPopulation Population { get; set; }
         double Tao { get; set; }
+        double R { get; set; }
+        double RestPotential { get; set; }
         Derivative DynamicRule { get; set; }
+        event EventHandler Updated;
+        void RegisterUpdated(EventHandler recordpotential);
+        void RegisterSpike(EventHandler recordspike);
+        void UnRegisterUpdated(EventHandler recordpotential);
+        void UnRegisterSpike(EventHandler recordspike);
+        void RecordStep(StreamWriter potentialwriter, RecordType recordtype,double currentT);
     }
 }

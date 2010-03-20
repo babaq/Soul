@@ -17,11 +17,16 @@ using System.Text;
 
 namespace SCore
 {
-    public interface IHilllock
+    public interface IHillock
     {
+        INeuron HostNeuron { get; set; }
         double Threshold { set; get; }
-        double Fire(double hilllockpotential);
+        double Fire(double hillockpotential, double currentT);
         double ResetPotential { set; get; }
         double RefractoryPeriod { set; get; }
+        bool IsInRefractoryPeriod(double currentT);
+        Queue<double > TravalingSpikeTime{ get;}
+        void CheckTravalingSpike(double currentT);
+        event EventHandler Spike;
     }
 }

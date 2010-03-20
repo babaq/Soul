@@ -22,11 +22,18 @@ namespace SCore
     {
         private double weight;
         private INeuron presynapticneuron;
+        private double axondelay;
 
         public WeightSynapse(INeuron presynapticneuron, double weight)
+            : this(presynapticneuron, weight, 0.0)
+        {
+        }
+
+        public WeightSynapse(INeuron presynapticneuron, double weight, double axondelay)
         {
             this.presynapticneuron = presynapticneuron;
             this.weight = weight;
+            this.axondelay = axondelay;
         }
 
 
@@ -52,7 +59,13 @@ namespace SCore
         public Point3D Position
         {
             get { return new Point3D(0.0, 0.0, 0.0); }
-            set {}
+            set { }
+        }
+
+        public double AxonDelay
+        {
+            get { return axondelay; }
+            set { axondelay = value; }
         }
 
         #endregion

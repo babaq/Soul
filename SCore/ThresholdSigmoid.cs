@@ -20,14 +20,14 @@ namespace SCore
 {
     public class ThresholdSigmoid : ThresholdHeaviside
     {
-        public ThresholdSigmoid(double threshold) : base(threshold)
+        public ThresholdSigmoid(INeuron hostneuron, double threshold) : base(hostneuron, threshold)
         {
         }
 
 
-        public override double Fire(double hilllockpotential)
+        public override double Fire(double hillockpotential, double currentT)
         {
-            return CoreFunc.Sigmoid(hilllockpotential - Threshold);
+            return CoreFunc.gSigmoid(hillockpotential - Threshold,1.0,0.0);
         }
 
     }

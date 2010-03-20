@@ -23,5 +23,6 @@ namespace SCore
         double Weight { set; get; }
         INeuron PreSynapticNeuron { get; }
         Point3D Position { set; get; }
+        double AxonDelay { set; get; }
     }
 }

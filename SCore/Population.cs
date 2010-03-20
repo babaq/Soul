@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
@@ -112,6 +113,46 @@ namespace SCore
             for (int i = 0; i < neurons.Count; i++)
             {
                 neurons.ElementAt(i).Value.Tick();
+            }
+        }
+
+        public void RegisterUpdated(EventHandler recordpotential)
+        {
+            for (int i = 0; i < neurons.Count; i++)
+            {
+                neurons.ElementAt(i).Value.RegisterUpdated(recordpotential);
+            }
+        }
+
+        public void RegisterSpike(EventHandler recordspike)
+        {
+            for (int i = 0; i < neurons.Count; i++)
+            {
+                neurons.ElementAt(i).Value.RegisterSpike(recordspike);
+            }
+        }
+
+        public void UnRegisterUpdated(EventHandler recordpotential)
+        {
+            for (int i = 0; i < neurons.Count; i++)
+            {
+                neurons.ElementAt(i).Value.UnRegisterUpdated(recordpotential);
+            }
+        }
+
+        public void UnRegisterSpike(EventHandler recordspike)
+        {
+            for (int i = 0; i < neurons.Count; i++)
+            {
+                neurons.ElementAt(i).Value.UnRegisterUpdated(recordspike);
+            }
+        }
+
+        public void RecordStep(StreamWriter potentialwriter, RecordType recordtype,double currentT)
+        {
+            for (int i = 0; i < neurons.Count; i++)
+            {
+                neurons.ElementAt(i).Value.RecordStep(potentialwriter,recordtype,currentT);
             }
         }
 

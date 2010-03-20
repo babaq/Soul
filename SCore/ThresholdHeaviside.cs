@@ -18,17 +18,27 @@ using SSolver;
 
 namespace SCore
 {
-    public class ThresholdHeaviside : IHilllock
+    public class ThresholdHeaviside : IHillock
     {
         private double threshold;
+        private INeuron hostneuron;
+        public event EventHandler Spike;
 
-        public ThresholdHeaviside(double threshold)
+
+        public ThresholdHeaviside(INeuron hostneuron, double threshold)
         {
             this.threshold = threshold;
+            this.hostneuron = hostneuron;
         }
 
 
-        #region IHilllock Members
+        #region IHillock Members
+
+        public INeuron HostNeuron
+        {
+            get { return hostneuron; }
+            set { hostneuron = value; }
+        }
 
         public double Threshold
         {
@@ -42,21 +52,43 @@ namespace SCore
             }
         }
 
-        public virtual double Fire(double hilllockpotential)
+        public virtual double Fire(double hillockpotential, double currentT)
         {
-            return CoreFunc.Heaviside(hilllockpotential - threshold);
+            return CoreFunc.Heaviside(hillockpotential - threshold);
         }
 
         public virtual double ResetPotential
         {
-            get { return -65.0; }
+            get { return -75.0; }
             set {}
         }
 
         public virtual double RefractoryPeriod
         {
-            get { return 1.5; }
+            get { return 1.0; }
             set {}
+        }
+
+        public virtual bool IsInRefractoryPeriod(double currentT)
+        {
+            return false;
+        }
+
+        public virtual Queue<double > TravalingSpikeTime
+        {
+            get { return new Queue<double>(); }
+        }
+
+        public virtual void CheckTravalingSpike(double currentT)
+        {
+        }
+
+        protected void FireSpike()
+        {
+            if (Spike != null)
+            {
+                Spike(HostNeuron, EventArgs.Empty);
+            }
         }
 
         #endregion
