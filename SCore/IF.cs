@@ -22,70 +22,52 @@ namespace SCore
     /// <summary>
     /// Integrate-and-Fire Model
     /// </summary>
+    [Serializable]
     public class IF : LI
     {
-        private double resistence;
-
-
-        public IF(double threshold,double resetpotential, double refractoryperiod, double initoutput, double tao, double resistence)
-            : this(new Point3D(0.0,0.0,0.0),new ThresholdSpike(threshold,resetpotential,refractoryperiod), initoutput, tao, resistence)
+        public IF(double threshold,double resetpotential, double refractoryperiod, double initoutput, double r, double c,double restpotential)
+            : this("IF",new Point3D(),new ThresholdSpike(null,threshold,resetpotential,refractoryperiod), initoutput, r, c,restpotential)
         {
         }
 
-        public IF(Point3D position, IHillock hilllock, double initoutput, double tao, double resistence)
-            : base(position, hilllock, initoutput, tao,-65.0)
+        public IF(string name,Point3D position, IHillock hillock, double initoutput, double r, double c,double restpotential)
+            : base(name, position, hillock, initoutput, r,c,restpotential)
         {
-            this.resistence = resistence;
             DynamicRule = CoreFunc.dIF;
         }
 
-
-        public override double R
-        {
-            get
-            {
-                return resistence;
-            }
-            set
-            {
-                resistence = value;
-            }
-        }
 
         public override void Update(double deltaT, double currentT, ISolver solver)
         {
             if (!Hillock.IsInRefractoryPeriod(currentT))
             {
+                var sigma = 0.0;
                 for (int i = 0; i < Synapses.Count; i++)
                 {
-                    var dirac = 0.0;
-                    if (Synapses[i].PreSynapticNeuron.Hillock.TravalingSpikeTime.Count > 0)
-                    {
-                        for (int j = 0; j < Synapses[i].PreSynapticNeuron.Hillock.TravalingSpikeTime.Count; j++)
-                        {
-                            dirac += CoreFunc.rDiracDelta(
-                                currentT - Synapses[i].PreSynapticNeuron.Hillock.TravalingSpikeTime.ElementAt(j) -
-                                Synapses[i].AxonDelay, deltaT);
-                        }
-                        Synapses[i].PreSynapticNeuron.Hillock.CheckTravalingSpike(currentT);
-                    }
-                    Output += dirac*Synapses[i].Weight;
+                    sigma += Synapses.ElementAt(i).Value.Release(deltaT, currentT);
                 }
-                var dynamicruleparam = new double[] {Tao, resistence, RestPotential, Output};
-                Output = solver.Solve(deltaT, currentT, LastOutput, dynamicruleparam, DynamicRule);
-                Output = Hillock.Fire(Output, currentT);
-                OnUpdated();
+                var dynamicruleparam = new double[] {Tao, R, RestPotential, sigma};
+                sigma = solver.Solve(deltaT, currentT, LastOutput, dynamicruleparam, DynamicRule);
+                Output = Hillock.Fire(sigma, currentT);
+                RaiseUpdated();
             }
         }
 
-        public override void RegisterSpike(EventHandler recordspike)
+        public override void RegisterSpike(EventHandler onspike)
         {
-            Hillock.Spike += recordspike;
+            Hillock.Spike += onspike;
         }
 
-        public override void UnRegisterSpike(EventHandler recordspike)
+        public override void UnRegisterSpike(EventHandler onspike)
         {
-            Hillock.Spike -= recordspike;
+            Hillock.Spike -= onspike;
+        }
+
+        public override object Clone()
+        {
+            var clone = new IF(Hillock.Threshold, Hillock.ResetPotential, Hillock.RefractoryPeriod, LastOutput, R, C,
+                               RestPotential);
+            return clone;
         }
 
     }

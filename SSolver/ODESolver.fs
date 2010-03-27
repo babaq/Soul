@@ -13,15 +13,36 @@
 namespace SSolver
 
 open System
+open System.Text
+open System.Reflection
 open CoreFunc
 
 /// <summary>
 /// Basic Ordinary Differential Equation Solver
 /// </summary>
 type ODESolver =
-    val mutable settings: int
-    new() = { settings = 0 }
+    val mutable private settings: SolverSettings
+    val mutable private solve: Solve
+    new() = new ODESolver(new SolverSettings())
+    new(s: SolverSettings) as osr =
+        {
+            settings=s;
+            solve = null
+        } then
+        osr.settings.SolverType <- SolverType.ODESolver
+        osr.SetMethod osr.settings.NumericMethod
+    member private osr.SetMethod (x: NumericMethod)=
+        match x with
+        | NumericMethod.Euler -> osr.solve <- new Solve(ddEuler)
+        | NumericMethod.RK4 -> osr.solve <- new Solve(ddRK4)
+        | _ -> ()
     interface ISolver with
-        member s.Settings with get() = s.settings and set(v) = s.settings <- v
-        member s.Solve(h, t, y, y'_param, y'_delegate) = ddRK4 h t y y'_param y'_delegate
+        member osr.Settings with get() = osr.settings and set(v) = osr.settings <- v; osr.SetMethod osr.settings.NumericMethod
+        member osr.Solve with get() = osr.solve
+        member osr.Summary with get() =
+            let s = new StringBuilder()
+            s.AppendLine("# Solver Summary. SSolver Version: "+Assembly.GetExecutingAssembly().GetName().Version.ToString())
+            s.AppendLine("# SolverType="+osr.settings.SolverType.ToString())
+            s.AppendLine("# NumericMethod="+osr.settings.NumericMethod.ToString())
+            s.ToString()
 

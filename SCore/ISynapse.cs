@@ -20,9 +20,11 @@ namespace SCore
 {
     public interface ISynapse
     {
+        Guid ID { get; }
         double Weight { set; get; }
         INeuron PreSynapticNeuron { get; }
         Point3D Position { set; get; }
         double AxonDelay { set; get; }
+        double Release(double deltaT,double currentT);
     }
 }

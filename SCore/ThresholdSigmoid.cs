@@ -18,16 +18,18 @@ using SSolver;
 
 namespace SCore
 {
+    [Serializable]
     public class ThresholdSigmoid : ThresholdHeaviside
     {
-        public ThresholdSigmoid(INeuron hostneuron, double threshold) : base(hostneuron, threshold)
+        public ThresholdSigmoid(INeuron hostneuron, double threshold)
+            : base(hostneuron, threshold)
         {
         }
 
 
         public override double Fire(double hillockpotential, double currentT)
         {
-            return CoreFunc.gSigmoid(hillockpotential - Threshold,1.0,0.0);
+            return CoreFunc.Sigmoid(hillockpotential - Threshold);
         }
 
     }

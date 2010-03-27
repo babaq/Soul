@@ -18,24 +18,26 @@ using SSolver;
 
 namespace SCore
 {
+    [Serializable]
     public class ThresholdSpike : ThresholdSigmoid
     {
         private double resetpotential;
         private double refractoryperiod;
-        private Queue<double> travalingspiketrain=new Queue<double>();
+        private Queue<double> travalingspiketrain;
 
 
-        public ThresholdSpike(double threshold, double resetpotential, double refractoryperiod)
-            : base(null, threshold)
+        public ThresholdSpike(INeuron hostneuron, double threshold, double resetpotential, double refractoryperiod)
+            : base(hostneuron, threshold)
         {
             this.resetpotential = resetpotential;
             this.refractoryperiod = refractoryperiod;
+            this.travalingspiketrain = new Queue<double>();
         }
 
 
         public override double Fire(double hillockpotential, double currentT)
         {
-            if (CoreFunc.Heaviside(hillockpotential-Threshold)==0)
+            if (CoreFunc.Heaviside(hillockpotential-Threshold)==0.0)
             {
                 return hillockpotential;
             }
@@ -47,39 +49,19 @@ namespace SCore
             }
         }
 
-        public override void CheckTravalingSpike(double currentT)
-        {
-            if(currentT-travalingspiketrain.Peek()>20.0)
-            {
-                travalingspiketrain.Dequeue();
-            }
-        }
-
         public override double ResetPotential
         {
-            get
-            {
-                return resetpotential;
-            }
-            set
-            {
-                resetpotential = value;
-            }
+            get{return resetpotential;}
+            set{resetpotential = value;}
         }
 
         public override double RefractoryPeriod
         {
-            get
-            {
-                return refractoryperiod;
-            }
-            set
-            {
-                refractoryperiod = value;
-            }
+            get{return refractoryperiod;}
+            set{refractoryperiod = value;}
         }
 
-        public override Queue<double > TravalingSpikeTime
+        public override Queue<double> TravalingSpikeTrain
         {
             get { return travalingspiketrain; }
         }
@@ -95,6 +77,14 @@ namespace SCore
                 return false;
             }
             return true;
+        }
+
+        public override void UpdateTravalingSpikeTrain(double currentT)
+        {
+            if(currentT-travalingspiketrain.Peek()>SConstants.AxonDelayMax)
+            {
+                travalingspiketrain.Dequeue();
+            }
         }
 
     }

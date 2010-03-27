@@ -11,36 +11,24 @@
 //--------------------------------------------------------------------------------
 
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using SSolver;
 
 namespace SCore
 {
-    public interface ISimulator
+    public interface IRecord
     {
-        INetwork Network { get; set; }
-        ISolver Solver { get; set; }
-        double DeltaT { set; get; }
-        double DurationT { set; get; }
-        double CurrentT { get; }
-        void Run();
-        void Step(double delta);
-        bool IsRunning { get; }
-        bool IsRunOver { get; }
+        ISimulation HostSimulator { get; set; }
         RecordType RecordType { get; set; }
         string RecordFile { get; set; }
-        void BeginRecord();
-        void EndRecord();
-        void RecordPotential(object sender, EventArgs e);
-        void RecordSpike(object sender, EventArgs e);
-        void RegisterUpdated(EventHandler recordpotential);
-        void RegisterSpike(EventHandler recordspike);
-        void UnRegisterUpdated(EventHandler recordpotential);
-        void UnRegisterSpike(EventHandler recordspike);
-        void RecordStep(StreamWriter potentialwriter, RecordType recordtype,double currentT);
+        void RecordBegin();
+        void RecordEnd();
+        void RecordOnUpdated(object sender, EventArgs e);
+        void RecordOnSpike(object sender, EventArgs e);
+        void Save(INetwork network,string file);
+        INetwork Open(string file);
     }
 
     public enum RecordType

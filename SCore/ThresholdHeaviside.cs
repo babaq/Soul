@@ -18,11 +18,11 @@ using SSolver;
 
 namespace SCore
 {
+    [Serializable]
     public class ThresholdHeaviside : IHillock
     {
         private double threshold;
         private INeuron hostneuron;
-        public event EventHandler Spike;
 
 
         public ThresholdHeaviside(INeuron hostneuron, double threshold)
@@ -42,14 +42,8 @@ namespace SCore
 
         public double Threshold
         {
-            get
-            {
-                return threshold;
-            }
-            set
-            {
-                threshold = value;
-            }
+            get{return threshold;}
+            set{threshold = value;}
         }
 
         public virtual double Fire(double hillockpotential, double currentT)
@@ -59,7 +53,7 @@ namespace SCore
 
         public virtual double ResetPotential
         {
-            get { return -75.0; }
+            get { return -60.0; }
             set {}
         }
 
@@ -74,22 +68,24 @@ namespace SCore
             return false;
         }
 
-        public virtual Queue<double > TravalingSpikeTime
+        public virtual Queue<double > TravalingSpikeTrain
         {
-            get { return new Queue<double>(); }
+            get { return null; }
         }
 
-        public virtual void CheckTravalingSpike(double currentT)
+        public virtual void UpdateTravalingSpikeTrain(double currentT)
         {
         }
 
-        protected void FireSpike()
+        public void FireSpike()
         {
             if (Spike != null)
             {
                 Spike(HostNeuron, EventArgs.Empty);
             }
         }
+
+        public event EventHandler Spike;
 
         #endregion
     }

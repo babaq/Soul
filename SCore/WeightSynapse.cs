@@ -18,37 +18,33 @@ using System.Windows.Media.Media3D;
 
 namespace SCore
 {
+    [Serializable]
     public class WeightSynapse : ISynapse
     {
+        private Guid id;
         private double weight;
         private INeuron presynapticneuron;
-        private double axondelay;
+
 
         public WeightSynapse(INeuron presynapticneuron, double weight)
-            : this(presynapticneuron, weight, 0.0)
         {
-        }
-
-        public WeightSynapse(INeuron presynapticneuron, double weight, double axondelay)
-        {
+            this.id = Guid.NewGuid();
             this.presynapticneuron = presynapticneuron;
             this.weight = weight;
-            this.axondelay = axondelay;
         }
 
 
         #region ISynapse Members
 
+        public Guid ID
+        {
+            get { return id; }
+        }
+
         public double Weight
         {
-            get
-            {
-                return weight;
-            }
-            set
-            {
-                weight = value;
-            }
+            get { return weight; }
+            set { weight = value; }
         }
 
         public INeuron PreSynapticNeuron
@@ -58,14 +54,19 @@ namespace SCore
 
         public Point3D Position
         {
-            get { return new Point3D(0.0, 0.0, 0.0); }
+            get { return new Point3D(); }
             set { }
         }
 
-        public double AxonDelay
+        public virtual double AxonDelay
         {
-            get { return axondelay; }
-            set { axondelay = value; }
+            get { return 0.0; }
+            set { }
+        }
+
+        public virtual double Release(double deltaT, double currentT)
+        {
+            return presynapticneuron.LastOutput * weight;
         }
 
         #endregion

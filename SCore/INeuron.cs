@@ -25,7 +25,7 @@ namespace SCore
         Guid ID { get; }
         string Name { set; get; }
         Point3D Position { set; get; }
-        List<ISynapse> Synapses { get; }
+        Dictionary<Guid,ISynapse> Synapses { get; }
         IHillock Hillock { set; get; }
         double Output { get; set; }
         double LastOutput { get; set; }
@@ -33,17 +33,18 @@ namespace SCore
         void Tick();
         void ProjectTo(INeuron targetneuron,ISynapse targetsynapse);
         void ProjectedFrom(INeuron sourceneuron,ISynapse selfsynapse);
-        void DisConnect(ISynapse selfsynapse);
-        IPopulation Population { get; set; }
-        double Tao { get; set; }
-        double R { get; set; }
-        double RestPotential { get; set; }
+        void DisConnect(Guid selfsynapseid);
+        INetwork ParentNetwork { get; set; }
         Derivative DynamicRule { get; set; }
         event EventHandler Updated;
-        void RegisterUpdated(EventHandler recordpotential);
-        void RegisterSpike(EventHandler recordspike);
-        void UnRegisterUpdated(EventHandler recordpotential);
-        void UnRegisterSpike(EventHandler recordspike);
-        void RecordStep(StreamWriter potentialwriter, RecordType recordtype,double currentT);
+        void RaiseUpdated();
+        double R { get; set; }
+        double C { get; set; }
+        double Tao { get; }
+        double RestPotential { get; set; }
+        void RegisterUpdated(EventHandler onoutput);
+        void RegisterSpike(EventHandler onspike);
+        void UnRegisterUpdated(EventHandler onoutput);
+        void UnRegisterSpike(EventHandler onspike);
     }
 }

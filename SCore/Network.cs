@@ -20,20 +20,28 @@ using SSolver;
 
 namespace SCore
 {
+    [Serializable]
     public class Network : INetwork
     {
         private Guid id;
         private string name;
         private Point3D position;
-        private Dictionary<Guid,INetwork> subnetworks;
+        private Dictionary<Guid, INeuron> neurons;
+        private Dictionary<Guid,INetwork> childnetworks;
         private INetwork parentnetwork;
 
-        public Network()
+
+        public Network():this("Network",new Point3D())
+        {
+        }
+
+        public Network(string name, Point3D position)
         {
             this.id = Guid.NewGuid();
-            this.name = "Network";
-            this.position = new Point3D(0.0,0.0,0.0);
-            subnetworks = new  Dictionary<Guid, INetwork>();
+            this.name = name;
+            this.position = position;
+            neurons = new Dictionary<Guid, INeuron>();
+            childnetworks = new  Dictionary<Guid, INetwork>();
             parentnetwork = null;
         }
 
@@ -42,39 +50,29 @@ namespace SCore
 
         public Guid ID
         {
-            get
-            {
-                return id;
-            }
+            get{return id;}
         }
 
         public string Name
         {
-            get
-            {
-                return name;
-            }
-            set
-            {
-                name = value;
-            }
+            get{return name;}
+            set{name = value;}
         }
 
         public Point3D Position
         {
-            get
-            {
-                return position;
-            }
-            set
-            {
-                position = value;
-            }
+            get{return position;}
+            set{position = value;}
         }
 
-        public Dictionary<Guid, INetwork> SubNetworks
+        public Dictionary<Guid,INeuron> Neurons
         {
-            get { return subnetworks; }
+            get { return neurons; }
+        }
+
+        public Dictionary<Guid, INetwork> ChildNetworks
+        {
+            get { return childnetworks; }
         }
 
         public INetwork ParentNetwork
@@ -86,7 +84,14 @@ namespace SCore
                 {
                     if (parentnetwork != null)
                     {
-                        parentnetwork.SubNetworks.Remove(this.id);
+                        try
+                        {
+                            parentnetwork.ChildNetworks.Remove(this.id);
+                        }
+                        catch (Exception e)
+                        {
+                        }
+                        parentnetwork = value;
                     }
                 }
                 else
@@ -94,13 +99,28 @@ namespace SCore
                     if (parentnetwork == null)
                     {
                         parentnetwork = value;
-                        parentnetwork.SubNetworks.Add(this.id, this);
+                        try
+                        {
+                            parentnetwork.ChildNetworks.Add(this.id, this);
+                        }
+                        catch (Exception e)
+                        {
+                        }
                     }
                     else
                     {
-                        parentnetwork.SubNetworks.Remove(this.id);
-                        parentnetwork = value;
-                        parentnetwork.SubNetworks.Add(this.id, this);
+                        if (parentnetwork != value)
+                        {
+                            try
+                            {
+                                parentnetwork.ChildNetworks.Remove(this.id);
+                                value.ChildNetworks.Add(this.id, this);
+                            }
+                            catch (Exception e)
+                            {
+                            }
+                            parentnetwork = value;
+                        }
                     }
                 }
             }
@@ -108,60 +128,104 @@ namespace SCore
 
         public void Update(double deltaT,double currentT,ISolver solver)
         {
-            for(int i=0;i<subnetworks.Count;i++)
+            for (int i = 0; i < neurons.Count; i++)
             {
-                subnetworks.ElementAt(i).Value.Update(deltaT,currentT, solver);
+                neurons.ElementAt(i).Value.Update(deltaT, currentT, solver);
+            }
+            for(int i=0;i<childnetworks.Count;i++)
+            {
+                childnetworks.ElementAt(i).Value.Update(deltaT,currentT, solver);
             }
         }
 
         public void Tick()
         {
-            for (int i = 0; i < subnetworks.Count; i++)
+            for (int i = 0; i < neurons.Count; i++)
             {
-                subnetworks.ElementAt(i).Value.Tick();
+                neurons.ElementAt(i).Value.Tick();
+            }
+            for (int i = 0; i < childnetworks.Count; i++)
+            {
+                childnetworks.ElementAt(i).Value.Tick();
             }
         }
 
-        public void RegisterUpdated(EventHandler recordpotential)
+        public void RegisterUpdated(EventHandler onoutput)
         {
-            for (int i = 0; i < subnetworks.Count; i++)
+            for (int i = 0; i < neurons.Count; i++)
             {
-                subnetworks.ElementAt(i).Value.RegisterUpdated(recordpotential);
+                neurons.ElementAt(i).Value.RegisterUpdated(onoutput);
+            }
+            for (int i = 0; i < childnetworks.Count; i++)
+            {
+                childnetworks.ElementAt(i).Value.RegisterUpdated(onoutput);
             }
         }
 
-        public void RegisterSpike(EventHandler recordspike)
+        public void RegisterSpike(EventHandler onspike)
         {
-            for (int i = 0; i < subnetworks.Count; i++)
+            for (int i = 0; i < neurons.Count; i++)
             {
-                subnetworks.ElementAt(i).Value.RegisterSpike(recordspike);
+                neurons.ElementAt(i).Value.RegisterSpike(onspike);
+            }
+            for (int i = 0; i < childnetworks.Count; i++)
+            {
+                childnetworks.ElementAt(i).Value.RegisterSpike(onspike);
             }
         }
 
-        public void UnRegisterUpdated(EventHandler recordpotential)
+        public void UnRegisterUpdated(EventHandler onoutput)
         {
-            for (int i = 0; i < subnetworks.Count; i++)
+            for (int i = 0; i < neurons.Count; i++)
             {
-                subnetworks.ElementAt(i).Value.UnRegisterUpdated(recordpotential);
+                neurons.ElementAt(i).Value.UnRegisterUpdated(onoutput);
+            }
+            for (int i = 0; i < childnetworks.Count; i++)
+            {
+                childnetworks.ElementAt(i).Value.UnRegisterUpdated(onoutput);
             }
         }
 
-        public void UnRegisterSpike(EventHandler recordspike)
+        public void UnRegisterSpike(EventHandler onspike)
         {
-            for (int i = 0; i < subnetworks.Count; i++)
+            for (int i = 0; i < neurons.Count; i++)
             {
-                subnetworks.ElementAt(i).Value.UnRegisterSpike(recordspike);
+                neurons.ElementAt(i).Value.UnRegisterUpdated(onspike);
+            }
+            for (int i = 0; i < childnetworks.Count; i++)
+            {
+                childnetworks.ElementAt(i).Value.UnRegisterSpike(onspike);
             }
         }
 
-        public void RecordStep(StreamWriter potentialwriter, RecordType recordtype, double currentT)
+        public void RaiseUpdated()
         {
-            for (int i = 0; i < subnetworks.Count; i++)
+            for (int i = 0; i < neurons.Count; i++)
             {
-                subnetworks.ElementAt(i).Value.RecordStep(potentialwriter,recordtype,currentT);
+                neurons.ElementAt(i).Value.RaiseUpdated();
+            }
+            for (int i = 0; i < childnetworks.Count; i++)
+            {
+                childnetworks.ElementAt(i).Value.RaiseUpdated();
+            }
+        }
+
+        public string Summary
+        {
+            get
+            {
+                var s = new StringBuilder();
+                s.AppendLine("# Network Summary.");
+                s.AppendLine("# ID=" + id.ToString("N"));
+                s.AppendLine("# Name=" + name);
+                s.AppendLine("# Position=" + position);
+                s.AppendLine("# NumberOfNeuron=" + neurons.Count);
+                s.AppendLine("# NumberOfChildNetwork=" + childnetworks.Count);
+                return s.ToString();
             }
         }
 
         #endregion
+
     }
 }

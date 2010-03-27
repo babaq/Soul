@@ -14,13 +14,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Runtime.Serialization;
-using System.Windows.Media.Media3D;
 
 namespace SCore
 {
-    public interface IPopulation
+    public static class SConstants
     {
-        Dictionary<Guid, INeuron> Neurons { get; }
+        public const double AxonDelayMax = 20.0;
     }
+
 }

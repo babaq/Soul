@@ -23,37 +23,34 @@ namespace SCore
     /// <summary>
     /// McCulloch-Pitts Model
     /// </summary>
+    [Serializable]
     public class MP : INeuron
     {
         private Guid id;
         private string name;
         private Point3D position;
-        private List<ISynapse> weightsynapses;
+        private Dictionary<Guid,ISynapse> weightsynapses;
         private IHillock hillock;
         private double output;
         private double lastoutput;
-        private IPopulation population;
-        private Derivative dynamicrule;
-        public event EventHandler Updated;
-
+        private INetwork parentnetwork;
+        
 
         public MP(double threshold,double initoutput)
-            : this(new Point3D(0.0,0.0,0.0), new ThresholdHeaviside(null, threshold),initoutput)
+            : this("MP",new Point3D(), new ThresholdHeaviside(null, threshold),initoutput)
         {
         }
 
-        public MP(Point3D position, IHillock hilllock,double initoutput)
+        public MP(string name,Point3D position, IHillock hillock,double initoutput)
         {
             id = Guid.NewGuid();
-            name = "MP";
+            this.name = name;
             this.position = position;
-            weightsynapses = new List<ISynapse>();
-            this.hillock = hilllock;
+            weightsynapses = new Dictionary<Guid,ISynapse>();
+            this.hillock = hillock;
             this.hillock.HostNeuron = this;
-            output = 0.0;
-            lastoutput = initoutput;
-            population =null;
-            dynamicrule = null;
+            output = lastoutput = initoutput;
+            parentnetwork =null;
         }
 
 
@@ -76,7 +73,7 @@ namespace SCore
             set { position = value; }
         }
 
-        public List<ISynapse> Synapses
+        public Dictionary<Guid,ISynapse> Synapses
         {
             get { return weightsynapses; }
         }
@@ -101,112 +98,124 @@ namespace SCore
 
         public virtual void Update(double deltaT,double currentT,ISolver solver)
         {
+            var sigma = 0.0;
             for (int i = 0; i < weightsynapses.Count; i++)
             {
-                output += weightsynapses[i].PreSynapticNeuron.LastOutput*weightsynapses[i].Weight;
+                sigma += weightsynapses.ElementAt(i).Value.Release(deltaT, currentT);
             }
-
-            output = hillock.Fire(output,currentT);
-            OnUpdated();
+            output = hillock.Fire(sigma,currentT);
+            RaiseUpdated();
         }
 
         public void Tick()
         {
             lastoutput = output;
-            output = 0.0;
         }
 
         public void ProjectTo(INeuron targetneuron, ISynapse targetsynapse)
         {
-            targetneuron.Synapses.Add(targetsynapse);
-            if (targetneuron.Population==null && this.population!=null)
+            if (!targetneuron.Synapses.ContainsValue(targetsynapse))
             {
-                targetneuron.Population=this.population;
-                return;
-            }
-            if (targetneuron.Population != null && this.population== null)
-            {
-                this.population = targetneuron.Population;
-                return;
+                targetneuron.Synapses.Add(targetsynapse.ID, targetsynapse);
+                if (targetneuron.ParentNetwork == null && this.parentnetwork != null)
+                {
+                    targetneuron.ParentNetwork = this.parentnetwork;
+                    return;
+                }
+                if (targetneuron.ParentNetwork != null && this.parentnetwork == null)
+                {
+                    this.parentnetwork = targetneuron.ParentNetwork;
+                    return;
+                }
             }
         }
 
         public void ProjectedFrom(INeuron sourceneuron, ISynapse selfsynapse)
         {
-            this.Synapses.Add(selfsynapse);
-            if (sourceneuron.Population == null && this.population!= null)
+            if (!this.Synapses.ContainsValue(selfsynapse))
             {
-                sourceneuron.Population = this.population;
-                return;
-            }
-            if (sourceneuron.Population != null && this.population == null)
-            {
-                this.population = sourceneuron.Population;
-                return;
+                this.Synapses.Add(selfsynapse.ID, selfsynapse);
+                if (sourceneuron.ParentNetwork == null && this.parentnetwork != null)
+                {
+                    sourceneuron.ParentNetwork = this.parentnetwork;
+                    return;
+                }
+                if (sourceneuron.ParentNetwork != null && this.parentnetwork == null)
+                {
+                    this.parentnetwork = sourceneuron.ParentNetwork;
+                    return;
+                }
             }
         }
 
-        public void DisConnect(ISynapse selfsynapse)
+        public void DisConnect(Guid selfsynapseid)
         {
-            if (Synapses.Contains(selfsynapse))
-                Synapses.Remove(selfsynapse);
+            if (Synapses.ContainsKey(selfsynapseid))
+            {
+                Synapses.Remove(selfsynapseid);
+            }
         }
 
-        public IPopulation Population
+        public INetwork ParentNetwork
         {
-            get { return population; }
+            get { return parentnetwork; }
             set
             {
                 if (value == null)
                 {
-                    if (population != null)
+                    if (parentnetwork != null)
                     {
-                        population.Neurons.Remove(this.id);
-                        population = value;
+                        try
+                        {
+                            parentnetwork.Neurons.Remove(this.id);
+                        }
+                        catch (Exception e)
+                        {
+                        }
+                        parentnetwork = value;
                     }
                 }
                 else
                 {
-                    if (population == null)
+                    if (parentnetwork == null)
                     {
-                        population = value;
-                        population.Neurons.Add(this.id, this);
+                        parentnetwork = value;
+                        try
+                        {
+                            parentnetwork.Neurons.Add(this.id, this);
+                        }
+                        catch (Exception e)
+                        {
+                        }
                     }
                     else
                     {
-                        population.Neurons.Remove(this.id);
-                        population = value;
-                        population.Neurons.Add(this.id, this);
+                        if (parentnetwork != value)
+                        {
+                            try
+                            {
+                                parentnetwork.Neurons.Remove(this.id);
+                                value.Neurons.Add(this.id, this);
+                            }
+                            catch (Exception e)
+                            {
+                            }
+                            parentnetwork = value;
+                        }
                     }
                 }
             }
         }
 
-        public virtual double Tao
-        {
-            get { return 0.0; }
-            set {}
-        }
-
-        public virtual double R
-        {
-            get { return 0.0; }
-            set {}
-        }
-
-        public virtual double RestPotential
-        {
-            get { return -65.0; }
-            set {}
-        }
-
         public Derivative DynamicRule
         {
-            get { return dynamicrule; }
-            set { dynamicrule = value; }
+            get { return null; }
+            set { }
         }
 
-        protected void OnUpdated()
+        public event EventHandler Updated;
+
+        public void RaiseUpdated()
         {
             if(Updated!=null)
             {
@@ -214,42 +223,59 @@ namespace SCore
             }
         }
 
-        public virtual void RegisterUpdated(EventHandler recordpotential)
+        public virtual double R
         {
-            Updated += recordpotential;
+            get { return 0.0; }
+            set { }
         }
 
-        public virtual void RegisterSpike(EventHandler recordspike)
+        public virtual double C
+        {
+            get { return 0.0; }
+            set {}
+        }
+
+        public double Tao
+        {
+            get { return R*C; }
+        }
+
+        public virtual double RestPotential
+        {
+            get { return 0.0; }
+            set { }
+        }
+
+        public virtual void RegisterUpdated(EventHandler onoutput)
+        {
+            Updated += onoutput;
+        }
+
+        public virtual void RegisterSpike(EventHandler onspike)
         {
         }
 
-        public virtual void UnRegisterUpdated(EventHandler recordpotential)
+        public virtual void UnRegisterUpdated(EventHandler onoutput)
         {
-            Updated -= recordpotential;
+            Updated -= onoutput;
         }
 
-        public virtual void UnRegisterSpike(EventHandler recordspike)
+        public virtual void UnRegisterSpike(EventHandler onspike)
         {
-        }
-
-        public void RecordStep(StreamWriter potentialwriter, RecordType recordtype,double currentT)
-        {
-            if (recordtype == RecordType.All && recordtype == RecordType.Potential)
-            {
-                potentialwriter.WriteLine(currentT.ToString("F3") + "," + Output.ToString("F3") + "," + ID.ToString("N"));
-            }
         }
 
         #endregion
+
 
         #region ICloneable Members
 
         public virtual object Clone()
         {
-            var clone = new MP(this.position, this.hillock, lastoutput);
+            var clone = new MP(this.hillock.Threshold, this.lastoutput);
             return clone;
         }
 
         #endregion
+
     }
 }

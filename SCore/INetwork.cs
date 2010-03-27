@@ -25,14 +25,16 @@ namespace SCore
         Guid ID { get; }
         string Name { get; set; }
         Point3D Position { set; get; }
-        Dictionary<Guid,INetwork> SubNetworks { get; }
+        Dictionary<Guid, INeuron> Neurons { get; }
+        Dictionary<Guid,INetwork> ChildNetworks { get; }
         INetwork ParentNetwork { get; set; }
         void Update(double deltaT,double currentT,ISolver solver);
         void Tick();
-        void RegisterUpdated(EventHandler recordpotential);
-        void RegisterSpike(EventHandler recordspike);
-        void UnRegisterUpdated(EventHandler recordpotential);
-        void UnRegisterSpike(EventHandler recordspike);
-        void RecordStep(StreamWriter potentialwriter, RecordType recordtype,double currentT);
+        void RegisterUpdated(EventHandler onoutput);
+        void RegisterSpike(EventHandler onspike);
+        void UnRegisterUpdated(EventHandler onoutput);
+        void UnRegisterSpike(EventHandler onspike);
+        void RaiseUpdated();
+        string Summary{ get;}
     }
 }

@@ -13,4 +13,8 @@
 namespace SSolver
 
 open System
+open CoreFunc
 
+/// <summary>
+/// Basic Partial Differential Equation Solver
+/// </summary>

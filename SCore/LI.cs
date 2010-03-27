@@ -22,60 +22,64 @@ namespace SCore
     /// <summary>
     /// Leaky Integrator Model
     /// </summary>
+    [Serializable]
     public class LI : MP
     {
-        private double tao;
+        private double r;
+        private double c;
         private double restpotential;
 
 
-        public LI(double threshold, double initoutput, double tao)
-            : this(new Point3D(0.0, 0.0, 0.0), new ThresholdSigmoid(null, threshold), initoutput, tao,-65.0)
+        public LI(double threshold, double initoutput, double r,double c,double restpotential)
+            : this("LI",new Point3D(), new ThresholdSigmoid(null, threshold), initoutput, r,c,restpotential)
         {
         }
 
-        public LI(Point3D position, IHillock hillock, double initoutput, double tao, double restpotentail)
-            : base(position, hillock, initoutput)
+        public LI(string name, Point3D position, IHillock hillock, double initoutput, double r, double c,double restpotential)
+            : base(name, position, hillock, initoutput)
         {
-            this.tao = tao;
-            this.restpotential = restpotentail;
+            this.r = r;
+            this.c = c;
+            this.restpotential = restpotential;
             DynamicRule = CoreFunc.dLI;
         }
 
 
-        public override double Tao
+        public override double R
         {
-            get
-            {
-                return tao;
-            }
-            set
-            {
-                tao = value;
-            }
+            get{return r;}
+            set{r = value;}
+        }
+
+        public override double C
+        {
+            get{return c;}
+            set{c = value;}
         }
 
         public override double RestPotential
         {
-            get
-            {
-                return restpotential;
-            }
-            set
-            {
-                restpotential = value;
-            }
+            get{return restpotential;}
+            set{restpotential = value;}
         }
 
         public override void Update(double deltaT,double currentT,ISolver solver)
         {
+            var sigma = 0.0;
             for (int i = 0; i < Synapses.Count; i++)
             {
-                Output += Synapses[i].PreSynapticNeuron.LastOutput * Synapses[i].Weight;
+                sigma += Synapses.ElementAt(i).Value.Release(deltaT, currentT);
             }
-            var dynamicruleparam = new double[] {tao,RestPotential, Output};
-            Output = solver.Solve(deltaT, currentT, LastOutput, dynamicruleparam, DynamicRule);
-            Output = Hillock.Fire(Output,currentT);
-            OnUpdated();
+            var dynamicruleparam = new double[] {Tao,RestPotential, sigma};
+            sigma = solver.Solve(deltaT, currentT, LastOutput, dynamicruleparam, DynamicRule);
+            Output = Hillock.Fire(sigma,currentT);
+            RaiseUpdated();
+        }
+
+        public override object Clone()
+        {
+            var clone = new LI(Hillock.Threshold, LastOutput, r,c,restpotential);
+            return clone;
         }
 
     }

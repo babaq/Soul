@@ -11,23 +11,31 @@
 //--------------------------------------------------------------------------------
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SSolver;
 
 namespace SCore
 {
-    public interface IHillock
+    public interface ISimulation
     {
-        INeuron HostNeuron { get; set; }
-        double Threshold { set; get; }
-        double Fire(double hillockpotential, double currentT);
-        double ResetPotential { set; get; }
-        double RefractoryPeriod { set; get; }
-        bool IsInRefractoryPeriod(double currentT);
-        Queue<double > TravalingSpikeTrain{ get;}
-        void UpdateTravalingSpikeTrain(double currentT);
-        event EventHandler Spike;
-        void FireSpike();
+        INetwork Network { get; set; }
+        ISolver Solver { get; set; }
+        IRecord Recorder { get; set; }
+        double DeltaT { set; get; }
+        double DurationT { set; get; }
+        double CurrentT { get; set; }
+        double Progress { get; }
+        void Run();
+        void Stop();
+        void Pause();
+        void Resume();
+        void Step(double deltatime);
+        bool IsRunning { get; }
+        bool IsPaused { get; }
+        string Summary { get; }
     }
+
 }

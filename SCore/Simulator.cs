@@ -13,238 +13,223 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Threading;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using SSolver;
 
 namespace SCore
 {
-    public class Simulator : ISimulator
+    public class Simulator : ISimulation
     {
-        private double t0;
+        private INetwork network;
+        private ISolver solver;
+        private IRecord recorder;
         private double deltaT;
         private double durationT;
         private double currentT;
+        private double t0;
+        private Thread runthread;
+        private EventWaitHandle hpause;
+        private EventWaitHandle hstop;
         private bool isrunning;
-        private bool isrunover;
-        private INetwork network;
-        private ISolver solver;
-        private RecordType recordtype;
-        private string recordfile;
-        private FileStream potentialfile;
-        private FileStream spikefile;
-        private StreamWriter potentialwriter;
-        private StreamWriter spikewriter;
+        private bool ispaused;
 
-        public Simulator(double deltatime, double durationtime,INetwork targetnetwork,ISolver solver,RecordType recordtype,string recordfile)
+
+        public Simulator(double deltatime, double durationtime,INetwork targetnetwork,ISolver solver,IRecord recorder)
         {
             deltaT = deltatime;
             durationT = durationtime;
             currentT = 0.0;
             t0 = currentT;
-            isrunning = false;
-            isrunover = false;
             network = targetnetwork;
             this.solver = solver;
-            this.recordtype = recordtype;
-            this.recordfile = recordfile;
+            this.recorder = recorder;
+            this.recorder.HostSimulator = this;
+            runthread = null;
+            hpause = new ManualResetEvent(true);
+            hstop = new ManualResetEvent(false);
+            isrunning = false;
+            ispaused = false;
         }
 
 
-        #region ISimulator Members
+        #region ISimulation Members
 
         public INetwork Network
         {
             get { return network; }
-            set { network = value; }
+            set
+            {
+                if (!IsRunning)
+                {
+                    network = value;
+                }
+            }
         }
 
         public ISolver Solver
         {
             get { return solver; }
-            set { solver = value; }
+            set
+            {
+                if (!IsRunning)
+                {
+                    solver = value;
+                }
+            }
+        }
+
+        public IRecord Recorder
+        {
+            get { return recorder; }
+            set
+            {
+                if (!IsRunning)
+                {
+                    recorder = value;
+                }
+            }
         }
 
         public double DeltaT
         {
-            get
-            {
-                return deltaT;
-            }
-            set
-            {
-                deltaT = value;
-            }
+            get{return deltaT;}
+            set{deltaT = value;}
         }
 
         public double DurationT
         {
-            get
-            {
-                return durationT;
-            }
-            set
-            {
-                durationT = value;
-            }
+            get{return durationT;}
+            set{durationT = value;}
         }
 
         public double CurrentT
         {
             get { return currentT; }
+            set
+            {
+                if (!IsRunning)
+                {
+                    currentT = value;
+                    t0 = currentT;
+                }
+            }
+        }
+
+        public double Progress
+        {
+            get { return (currentT - t0)/durationT; }
         }
 
         public void Run()
         {
-            if (network != null && solver != null)
+            if (!IsRunning)
             {
-                isrunning = true;
-                BeginRecord();
+                if (network != null && solver != null && recorder != null)
+                {
+                    runthread = new Thread(run);
+                    runthread.Name = "Run";
+                    runthread.Start();
+                    isrunning = true;
+                }
+            }
+        }
+
+        private void run()
+        {
+            try
+            {
+                recorder.RecordBegin();
+                t0 = currentT;
                 do
                 {
-                    Step();
-                } while (currentT -t0<= durationT);
-                EndRecord();
-                t0 = currentT;
+                    hpause.WaitOne(Timeout.Infinite);
+                    if (hstop.WaitOne(0))
+                    {
+                        break;
+                    }
+                    Step(deltaT);
+                } while (currentT - t0 < durationT);
+            }
+            catch (Exception e)
+            {
+            }
+            finally
+            {
+                recorder.RecordEnd();
                 isrunning = false;
-                isrunover = true;
             }
         }
 
-        public virtual void BeginRecord()
+        public void Stop()
         {
-            if (recordtype != RecordType.None)
+            if(IsRunning)
             {
-                var file = "";
-                if(string.IsNullOrEmpty(recordfile))
-                {
-                    file = DateTime.Now.ToShortTimeString();
-                }
-                else
-                {
-                    file = recordfile + "_" + DateTime.Now.ToShortTimeString();
-                }
-                switch (recordtype)
-                {
-                    case RecordType.Potential:
-                        potentialfile = new FileStream(file+"_v.csv", FileMode.Append, FileAccess.Write);
-                        potentialwriter = new StreamWriter(potentialfile,Encoding.ASCII);
-                        RegisterUpdated(new EventHandler(RecordPotential));
-                        RecordStep(potentialwriter, recordtype,currentT);
-                        break;
-                    case RecordType.Spike:
-                        spikefile = new FileStream(file+"_s.csv",FileMode.Append,FileAccess.Write);
-                        spikewriter = new StreamWriter(spikefile,Encoding.ASCII);
-                        RegisterSpike(new EventHandler(RecordSpike));
-                        break;
-                    default:
-                        potentialfile = new FileStream(file + "_v.csv", FileMode.Append, FileAccess.Write);
-                        spikefile = new FileStream(file + "_s.csv", FileMode.Append, FileAccess.Write);
-                        potentialwriter = new StreamWriter(potentialfile, Encoding.ASCII);
-                        spikewriter = new StreamWriter(spikefile, Encoding.ASCII);
-                        RegisterUpdated(new EventHandler(RecordPotential));
-                        RegisterSpike(new EventHandler(RecordSpike));
-                        RecordStep(potentialwriter, recordtype,currentT);
-                        break;
-                }
-
+                hstop.Set();
+                Resume();
+                runthread.Join();
+                hstop.Reset();
             }
         }
 
-        public void RecordStep(StreamWriter potentialwriter,RecordType recordtype,double currentT)
+        public void Pause()
         {
-            network.RecordStep(potentialwriter,recordtype,currentT);
-        }
-
-        public void RegisterSpike(EventHandler recordspike)
-        {
-            network.RegisterSpike(recordspike);
-        }
-
-        public void RegisterUpdated(EventHandler recordpotential)
-        {
-            network.RegisterUpdated(recordpotential);
-        }
-
-        public void UnRegisterSpike(EventHandler recordspike)
-        {
-            network.UnRegisterSpike(recordspike);
-        }
-
-        public void UnRegisterUpdated(EventHandler recordpotential)
-        {
-            network.UnRegisterUpdated(recordpotential);
-        }
-
-        public virtual void RecordPotential(object sender, EventArgs e)
-        {
-            var neuron = sender as INeuron;
-            potentialwriter.WriteLine(currentT.ToString("F3")+","+neuron.Output.ToString("F3")+","+neuron.ID.ToString("N"));
-        }
-
-        public virtual void RecordSpike(object sender, EventArgs e)
-        {
-            var neuron = sender as INeuron;
-            spikewriter.WriteLine(currentT.ToString("F3") + ","+ neuron.ID.ToString("N"));
-        }
-
-        public virtual void EndRecord()
-        {
-            if(recordtype!=RecordType.None)
+            if(IsRunning&&!IsPaused)
             {
-                if(spikewriter!=null)
-                {
-                    spikewriter.Close();
-                    spikefile.Close();
-                    spikewriter.Dispose();
-                    spikefile.Dispose();
-                    UnRegisterSpike(new EventHandler(RecordSpike));
-                }
-                if(potentialwriter!=null)
-                {
-                    potentialwriter.Close();
-                    potentialfile.Close();
-                    potentialwriter.Dispose();
-                    potentialfile.Dispose();
-                    UnRegisterUpdated(new EventHandler(RecordPotential));
-                }
+                hpause.Reset();
+                ispaused = true;
             }
         }
 
-        public void Step()
+        public void Resume()
         {
-            Step(deltaT);
+            if (IsRunning&&IsPaused)
+            {
+                hpause.Set();
+                ispaused = false;
+            }
         }
 
-        public void Step(double delta)
+        public void Step(double deltatime)
         {
-            network.Update(delta,currentT, solver);
+            currentT += deltatime;
+            network.Update(deltatime,currentT, solver);
             network.Tick();
-            currentT += delta;
         }
 
         public bool IsRunning
         {
-            get { return isrunning; }
+            get{return isrunning;}
         }
 
-        public bool IsRunOver
+        public bool IsPaused
         {
-            get { return isrunover; }
+            get { return ispaused; }
         }
 
-        public RecordType RecordType
+        public string Summary
         {
-            get { return recordtype; }
-            set { recordtype = value; }
-        }
-
-        public string RecordFile
-        {
-            get { return recordfile; }
-            set { recordfile = value; }
+            get
+            {
+                var s = new StringBuilder();
+                s.AppendLine("############################################################");
+                s.AppendLine("# The Soul Neural Network Simulation System. SCore Version: "+Assembly.GetExecutingAssembly().GetName().Version);
+                s.AppendLine("# ");
+                s.Append(network.Summary);
+                s.AppendLine("# ");
+                s.Append(solver.Summary);
+                s.AppendLine("# ");
+                s.AppendLine("# Simulation Summary.");
+                s.AppendLine("# DeltaT=" + deltaT);
+                s.AppendLine("# DurationT=" + durationT);
+                s.AppendLine("############################################################");
+                return s.ToString();
+            }
         }
 
         #endregion
+
     }
 }
