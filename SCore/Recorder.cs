@@ -68,7 +68,7 @@ namespace SCore
                 if(recordtype==RecordType.Potential || recordtype==RecordType.All)
                 {
                     potentialfile = new FileStream(file + "_v.txt", FileMode.Append, FileAccess.Write);
-                    potentialwriter = new StreamWriter(potentialfile, Encoding.Unicode);
+                    potentialwriter = new StreamWriter(potentialfile, Encoding.ASCII);
                     hostsimulator.Network.RegisterUpdated(RecordOnUpdated);
                     potentialwriter.WriteLine(hostsimulator.Summary);
                     hostsimulator.Network.RaiseUpdated();
@@ -76,7 +76,7 @@ namespace SCore
                 if (recordtype == RecordType.Spike || recordtype == RecordType.All)
                 {
                     spikefile = new FileStream(file + "_s.txt", FileMode.Append, FileAccess.Write);
-                    spikewriter = new StreamWriter(spikefile, Encoding.Unicode);
+                    spikewriter = new StreamWriter(spikefile, Encoding.ASCII);
                     hostsimulator.Network.RegisterSpike(RecordOnSpike);
                     spikewriter.WriteLine(hostsimulator.Summary);
                 }
@@ -110,13 +110,13 @@ namespace SCore
         public virtual void RecordOnUpdated(object sender, EventArgs e)
         {
             var neuron = sender as INeuron;
-            potentialwriter.WriteLine(hostsimulator.CurrentT.ToString("F3") + " " + neuron.Output.ToString("F3") + " " + neuron.ID.ToString("N"));
+            potentialwriter.WriteLine(hostsimulator.CurrentT.ToString("F3") + "\t"+ neuron.Output.ToString("F3") + "\t" + neuron.ID.ToString("N"));
         }
 
         public virtual void RecordOnSpike(object sender, EventArgs e)
         {
             var neuron = sender as INeuron;
-            spikewriter.WriteLine(hostsimulator.CurrentT.ToString("F3") + " " + neuron.ID.ToString("N"));
+            spikewriter.WriteLine(hostsimulator.CurrentT.ToString("F3") + "\t" + neuron.ID.ToString("N"));
         }
 
         public void Save(INetwork network, string file)

@@ -53,7 +53,7 @@ namespace SCore
                 }
                 PreSynapticNeuron.Hillock.UpdateTravalingSpikeTrain(currentT);
             }
-            return dirac;
+            return dirac*Weight;
         }
 
     }

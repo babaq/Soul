@@ -1,0 +1,99 @@
+﻿<Window x:Class="Soul.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Soul="clr-namespace:Soul"
+    Title="Soul" Height="600" Width="800" WindowStartupLocation="CenterScreen" Icon="Soul.ico">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <Menu Name="MainMenu" Grid.Row="0" Grid.RowSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <MenuItem Header="File" >
+                <MenuItem Header="New">
+                    
+                </MenuItem>
+                <MenuItem Header="Open">
+                    
+                </MenuItem>
+                <MenuItem Header="Save">
+                    
+                </MenuItem>
+                <MenuItem Header="Exit" Click="Exit_Click" >
+                    
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="Edit">
+                
+            </MenuItem> 
+            <MenuItem Header="View">
+                
+            </MenuItem>
+            <MenuItem Header="Simulation">
+                <MenuItem Header="Run">
+                    
+                </MenuItem>
+                <MenuItem Header="Stop">
+
+                </MenuItem>
+                <MenuItem Header="Pause">
+
+                </MenuItem>
+                <MenuItem Header="Resume">
+
+                </MenuItem>
+                <MenuItem Header="Step">
+
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="Tools">
+                
+            </MenuItem>
+            <MenuItem Header="Analyze">
+
+            </MenuItem>
+            <MenuItem Header="Window">
+                
+            </MenuItem>
+            <MenuItem Header="Help">
+                <MenuItem Header="Help">
+                    
+                </MenuItem>
+                <MenuItem Header="About" Click="About_Click">
+                    
+                </MenuItem> 
+            </MenuItem>
+        </Menu>
+        
+        <ToolBar Name="MainToolBar" Grid.Row="1" Grid.RowSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            
+        </ToolBar>
+        
+        <TabControl Name="MainTab" Grid.Row="2" Grid.RowSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <TabItem Header="WorkShop" Name="WorkShopTab">
+                <Soul:WorkShop x:Name="WorkShop" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+            </TabItem>
+            
+            <TabItem Header="Monitor" Name="MonitorTab">
+                
+            </TabItem>
+            
+            <TabItem Header="Analyze" Name="AnalyzeTab">
+                
+            </TabItem>
+            
+        </TabControl>
+        
+        <StatusBar Name="MainStatusBar" Grid.Row="3" Grid.RowSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <StatusBarItem >
+                <TextBlock>
+                status
+                </TextBlock>
+            </StatusBarItem>
+        </StatusBar>  
+        
+    </Grid>
+</Window>

@@ -41,9 +41,9 @@ namespace SCoreTest01
             // solver to be used
             solver = new ODESolver();
             // recorder to be used
-            recorder = new Recorder(simulator,RecordType.None,"SCoreTest01");
+            recorder = new Recorder(simulator,RecordType.All,"SCoreTest01");
             // simulator
-            simulator = new Simulator(0.01, 5000, network, solver, recorder);
+            simulator = new Simulator(0.01, 50, network, solver, recorder);
             Console.WriteLine("Init Done. Ready for Simulation.\n");
         }
 

@@ -15,18 +15,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SCore
+namespace Soul
 {
-    /// <summary>
-    /// Hodgkin-Huxley Model
-    /// </summary>
-    public class HH
+    public enum ActionType
     {
-        public HH()
-        {
-            
-        }
-
+        None,
+        Rotate,
+        Zoom,
+        Translate,
+        Select,
+        Deselect,
+        Reset
     }
-
 }

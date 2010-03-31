@@ -1,0 +1,29 @@
+﻿<Window x:Class="Soul.AboutWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="About Soul" Height="400" Width="500" ShowInTaskbar="False" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" MinHeight="210" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="140" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Image Name="SoulImage" Stretch="None"  Source="Soul.png" />
+        <StackPanel Grid.Row="0" Grid.RowSpan="1" Grid.Column="1" Grid.ColumnSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" >
+            <Label FontWeight="Bold" FontSize="35">Soul</Label>
+            <Label FontWeight="Bold" FontSize="15">Copyright © 2010 LBE Group</Label>
+            <TextBlock>
+                    <Hyperlink Click="Codeplex_Click">
+                        http://soul.codeplex.com
+                    </Hyperlink>
+            </TextBlock>
+        </StackPanel>
+        <Button Grid.Column="1" Grid.Row="1" Height="25" HorizontalAlignment="Right" Margin="0,0,12,12"
+                Name="AboutOK" VerticalAlignment="Bottom" Width="55" Click="AboutOK_Click" >
+            OK
+        </Button>
+    </Grid>
+</Window>
