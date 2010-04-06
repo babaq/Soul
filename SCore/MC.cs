@@ -15,13 +15,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Soul
+namespace SCore
 {
-    public enum ActionType
+    /// <summary>
+    /// Multiple Compartment Model
+    /// </summary>
+    public class MC
     {
-        None,
-        Rotate,
-        Zoom,
-        Translate,
+        public MC()
+        {
+            
+        }
+
     }
+
 }

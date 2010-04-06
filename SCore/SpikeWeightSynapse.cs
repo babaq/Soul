@@ -43,15 +43,15 @@ namespace SCore
         public override double Release(double deltaT, double currentT)
         {
             var dirac = 0.0;
-            if (PreSynapticNeuron.Hillock.TravalingSpikeTrain.Count > 0)
+            if (PreSynapticNeuron.Hillock.TravelingSpikeTrain.Count > 0)
             {
-                for (int i = 0; i < PreSynapticNeuron.Hillock.TravalingSpikeTrain.Count; i++)
+                for (int i = 0; i < PreSynapticNeuron.Hillock.TravelingSpikeTrain.Count; i++)
                 {
                     dirac += CoreFunc.rDiracDelta(
-                        currentT - PreSynapticNeuron.Hillock.TravalingSpikeTrain.ElementAt(i) -
+                        currentT - PreSynapticNeuron.Hillock.TravelingSpikeTrain.ElementAt(i) -
                         axondelay, deltaT);
                 }
-                PreSynapticNeuron.Hillock.UpdateTravalingSpikeTrain(currentT);
+                PreSynapticNeuron.Hillock.UpdateTravelingSpikeTrain(currentT);
             }
             return dirac*Weight;
         }

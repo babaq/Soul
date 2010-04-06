@@ -14,14 +14,34 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Media.Media3D;
 
 namespace Soul
 {
-    public enum ActionType
+    public class CellNetwork:ICellNetwork
     {
-        None,
-        Rotate,
-        Zoom,
-        Translate,
+        private ModelVisual3D mophology;
+
+        public CellNetwork(ModelVisual3D mophology)
+        {
+            this.mophology = mophology;
+        }
+
+
+        #region ICellNetwork Members
+
+        public System.Windows.Media.Media3D.ModelVisual3D Mophology
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        #endregion
     }
 }

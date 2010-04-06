@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -20,13 +21,14 @@ using SSolver;
 
 namespace SCore
 {
-    public interface INeuron : ICloneable
+    public interface INeuron : ICloneable, INotifyPropertyChanged
     {
         Guid ID { get; }
         string Name { set; get; }
         Point3D Position { set; get; }
         Dictionary<Guid,ISynapse> Synapses { get; }
         IHillock Hillock { set; get; }
+        double Potential { get; set; }
         double Output { get; set; }
         double LastOutput { get; set; }
         void Update(double deltaT,double currentT,ISolver solver);
@@ -46,5 +48,18 @@ namespace SCore
         void RegisterSpike(EventHandler onspike);
         void UnRegisterUpdated(EventHandler onoutput);
         void UnRegisterSpike(EventHandler onspike);
+        NeuronType Type { get; }
+        void NotifyPropertyChanged(string propertyname);
     }
+
+
+    public enum NeuronType
+    {
+        MP,
+        LI,
+        IF,
+        HH,
+        MC
+    }
+
 }

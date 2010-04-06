@@ -15,13 +15,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Soul
+namespace SCore
 {
-    public enum ActionType
+    public interface ICompartment
     {
-        None,
-        Rotate,
-        Zoom,
-        Translate,
     }
 }

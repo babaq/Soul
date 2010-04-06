@@ -11,6 +11,7 @@
 //--------------------------------------------------------------------------------
 
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Collections.Generic;
 using System.Threading;
@@ -129,8 +130,7 @@ namespace SCore
             {
                 if (network != null && solver != null && recorder != null)
                 {
-                    runthread = new Thread(run);
-                    runthread.Name = "Run";
+                    runthread = new Thread(run) {Name = "Run"};
                     runthread.Start();
                     isrunning = true;
                 }
@@ -160,6 +160,7 @@ namespace SCore
             {
                 recorder.RecordEnd();
                 isrunning = false;
+                RaiseRunOver();
             }
         }
 
@@ -197,6 +198,7 @@ namespace SCore
             currentT += deltatime;
             network.Update(deltatime,currentT, solver);
             network.Tick();
+            RaiseSteped();
         }
 
         public bool IsRunning
@@ -207,6 +209,26 @@ namespace SCore
         public bool IsPaused
         {
             get { return ispaused; }
+        }
+
+        public event EventHandler RunOver;
+
+        public event EventHandler Steped;
+
+        public void RaiseRunOver()
+        {
+            if (RunOver != null)
+            {
+                RunOver(this, EventArgs.Empty);
+            }
+        }
+
+        public void RaiseSteped()
+        {
+            if(Steped!=null)
+            {
+                Steped(this, EventArgs.Empty);
+            }
         }
 
         public string Summary
@@ -228,6 +250,16 @@ namespace SCore
                 return s.ToString();
             }
         }
+
+        public void NotifyPropertyChanged(string propertyname)
+        {
+            if(PropertyChanged!=null)
+            {
+                PropertyChanged(this,new PropertyChangedEventArgs(propertyname));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
 

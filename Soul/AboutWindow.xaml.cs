@@ -24,6 +24,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using SCore;
+using SSolver;
 
 namespace Soul
 {
@@ -35,11 +37,28 @@ namespace Soul
         public AboutWindow()
         {
             InitializeComponent();
+
+            var soulversion = "Soul\t Version: \t" + Assembly.GetExecutingAssembly().GetName().Version;
+            var scoreversion = "SCore\t Version: \t" + Assembly.GetAssembly(typeof (INeuron)).GetName().Version;
+            var ssolverversion = "SSolver\t Version: \t" + Assembly.GetAssembly(typeof (ISolver)).GetName().Version;
+
+            var version = new Label
+                              {
+                                  Content = soulversion + "\n" +
+                                            scoreversion + "\n" +
+                                            ssolverversion,
+                                  HorizontalAlignment = HorizontalAlignment.Center,
+                                  Margin = new Thickness(12, 55, 0, 12),
+                                  FontSize = 15,
+                                  Foreground = Brushes.DeepPink
+                              };
+            Info.Children.Add(version);
         }
+
 
         private void AboutOK_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = true;
+            DialogResult = true;
         }
 
         static void OpenLink(string url)

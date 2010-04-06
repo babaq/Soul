@@ -11,6 +11,7 @@
 //--------------------------------------------------------------------------------
 
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ using SSolver;
 
 namespace SCore
 {
-    public interface ISimulation
+    public interface ISimulation : INotifyPropertyChanged
     {
         INetwork Network { get; set; }
         ISolver Solver { get; set; }
@@ -35,7 +36,12 @@ namespace SCore
         void Step(double deltatime);
         bool IsRunning { get; }
         bool IsPaused { get; }
+        event EventHandler RunOver;
+        event EventHandler Steped;
+        void RaiseRunOver();
+        void RaiseSteped();
         string Summary { get; }
+        void NotifyPropertyChanged(string propertyname);
     }
 
 }

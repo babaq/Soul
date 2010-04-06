@@ -25,17 +25,17 @@ namespace Soul
 
         static Ellipsoid()
         {
-            Mesh = GetEllipsoid(1,1,1,2);
+            Mesh = GetEllipsoid(1, 1, 1, 2);
             Mesh.Freeze();
         }
 
-        public static MeshGeometry3D GetEllipsoid(double rx, double ry,double rz,int divisions)
+        public static MeshGeometry3D GetEllipsoid(double rx, double ry, double rz, int divisions)
         {
             divisions = Math.Max(0, divisions);
-            var e = Octahedron(rx,ry,rz);
+            var e = Octahedron(rx, ry, rz);
             for (int i = 0; i < divisions; i++)
             {
-                Divide(rx,ry,rz,e);
+                Divide(rx, ry, rz, e);
             }
             return e;
         }
@@ -67,7 +67,7 @@ namespace Soul
 
         static void AddTriangle(MeshGeometry3D mesh, Point3D p1, Point3D p2, Point3D p3)
         {
-            var index = mesh.Positions.Count ;
+            var index = mesh.Positions.Count;
             mesh.Positions.Add(p1);
             mesh.Positions.Add(p2);
             mesh.Positions.Add(p3);
@@ -81,16 +81,16 @@ namespace Soul
             mesh.TriangleIndices.Add(index);
         }
 
-        static void Divide(double rx, double ry, double rz,MeshGeometry3D mesh)
+        static void Divide(double rx, double ry, double rz, MeshGeometry3D mesh)
         {
             var indexCount = mesh.TriangleIndices.Count;
             for (int indexOffset = 0; indexOffset < indexCount; indexOffset += 3)
             {
-                DivideTriangle(rx,ry,rz,mesh, indexOffset);
+                DivideTriangle(rx, ry, rz, mesh, indexOffset);
             }
         }
 
-        static void DivideTriangle(double rx, double ry, double rz,MeshGeometry3D mesh, int indexOffset)
+        static void DivideTriangle(double rx, double ry, double rz, MeshGeometry3D mesh, int indexOffset)
         {
             var nextIndex = mesh.Positions.Count;
             int i1 = mesh.TriangleIndices[indexOffset];
@@ -100,9 +100,9 @@ namespace Soul
             Point3D p1 = mesh.Positions[i1];
             Point3D p2 = mesh.Positions[i2];
             Point3D p3 = mesh.Positions[i3];
-            Point3D p4 = GetInterpolatePoint(rx,ry,rz,p1, p2);
-            Point3D p5 = GetInterpolatePoint(rx,ry,rz,p2, p3);
-            Point3D p6 = GetInterpolatePoint(rx,ry,rz,p3, p1);
+            Point3D p4 = GetInterpolatePoint(rx, ry, rz, p1, p2);
+            Point3D p5 = GetInterpolatePoint(rx, ry, rz, p2, p3);
+            Point3D p6 = GetInterpolatePoint(rx, ry, rz, p3, p1);
 
             mesh.Positions.Add(p4);
             mesh.Positions.Add(p5);
@@ -133,38 +133,22 @@ namespace Soul
             mesh.TriangleIndices.Add(i3);
         }
 
-        static Point3D GetInterpolatePoint(double rx, double ry, double rz,Point3D p1, Point3D p2)
+        static Point3D GetInterpolatePoint(double rx, double ry, double rz, Point3D p1, Point3D p2)
         {
             if (rx == ry && ry == rz)
             {
-                var vector = new Vector3D((p1.X + p2.X)/2, (p1.Y + p2.Y)/2, (p1.Z + p2.Z)/2);
-                vector.Normalize();
-                vector*= rx;
-                return new Point3D(vector.X, vector.Y, vector.Z);
+                var midpointvector = new Vector3D((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2, (p1.Z + p2.Z) / 2);
+                midpointvector.Normalize();
+                midpointvector *= rx;
+                return new Point3D(midpointvector.X, midpointvector.Y, midpointvector.Z);
             }
             else
             {
-                var vector = new Vector3D((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2, (p1.Z + p2.Z) / 2);
-                var vv = new Vector3D(vector.X, vector.Y, 0);
-                var phi = Vector3D.AngleBetween(vv,vector)*Math.PI/180;
-                //var phi = Vector3D.AngleBetween(new Vector3D(0, 0, 1), vector) * Math.PI / 180;
-                var theta = Vector3D.AngleBetween(new Vector3D(1, 0, 0), vv)*Math.PI/180;
-                var ax = Vector3D.AngleBetween(vector,new Vector3D(1, 0, 0)) * Math.PI / 180;
-                var ay = Vector3D.AngleBetween(vector, new Vector3D(0, 1, 0)) * Math.PI / 180;
-                var az = Vector3D.AngleBetween(vector, new Vector3D(0, 0, 1)) * Math.PI / 180;
-                var sx = Math.Sign(vector.X);
-                var sy = Math.Sign(vector.Y);
-                var sz = Math.Sign(vector.Z);
-                //return new Point3D(sx*rx*Math.Cos(phi)*Math.Cos(theta),sy*ry*Math.Cos(phi)*Math.Sin(theta),sz*rz*Math.Sin(phi));
-                return new Point3D(rx * Math.Cos(ax) , ry * Math.Cos(ay) , rz * Math.Cos(az));
-
-
-                //var s = Math.Sign(p1.X + p2.X);
-                //var ydx = (p1.Y + p2.Y)/(p1.X + p2.X);
-                //var zdx = (p1.Z + p2.Z) / (p1.X + p2.X);
-                //var x = s*Math.Sqrt(1/(rx*rx) + (ydx*ydx)/(ry*ry) + (zdx*zdx)/(rz*rz));
-                ////var x = Math.Sqrt(rx * rx +(ry * ry) /(ydx * ydx)   +(rz * rz) /(zdx * zdx) );
-                //return new Point3D(x,x*ydx,x*zdx);
+                var midpointvector = new Vector3D((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2, (p1.Z + p2.Z) / 2);
+                var ax = Vector3D.AngleBetween(midpointvector, new Vector3D(1, 0, 0)) * Math.PI / 180;
+                var ay = Vector3D.AngleBetween(midpointvector, new Vector3D(0, 1, 0)) * Math.PI / 180;
+                var az = Vector3D.AngleBetween(midpointvector, new Vector3D(0, 0, 1)) * Math.PI / 180;
+                return new Point3D(rx * Math.Cos(ax), ry * Math.Cos(ay), rz * Math.Cos(az));
             }
         }
 

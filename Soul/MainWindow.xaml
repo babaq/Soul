@@ -2,27 +2,53 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Soul="clr-namespace:Soul"
-    Title="Soul" Height="600" Width="800" WindowStartupLocation="CenterScreen" Icon="Soul.ico">
+    Title="Soul" Height="600" Width="800" Background="Lavender" WindowStartupLocation="CenterScreen" Icon="Soul.ico">
+    
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Open" Executed="Open_Executed"/>
+        <CommandBinding Command="ApplicationCommands.Save" Executed="Save_Executed"/>
+        <CommandBinding Command="ApplicationCommands.Close" Executed="Close_Executed" />
+        <CommandBinding Command="ApplicationCommands.Help" Executed="Help_Executed"/>
+        
+        <CommandBinding Command="Soul:SCommands.Run" Executed="Run_Executed"/>
+        <CommandBinding Command="Soul:SCommands.Stop" Executed="Stop_Executed"/>
+        <CommandBinding Command="Soul:SCommands.Step" Executed="Step_Executed" CanExecute="Step_CanExecute" />
+        <CommandBinding Command="Soul:SCommands.IsReportProgress" Executed="IsReportProgress_Executed"/>
+        <CommandBinding Command="Soul:SCommands.IsImaging" Executed="IsImaging_Executed"/>
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Command="Soul:SCommands.Run" Key="F5"/>
+        <KeyBinding Command="Soul:SCommands.Step" Key="F6"/>
+    </Window.InputBindings>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="28" />
             <RowDefinition Height="1*"/>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         
-        <Menu Name="MainMenu" Grid.Row="0" Grid.RowSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-            <MenuItem Header="File" >
-                <MenuItem Header="New">
+        <Menu Name="MainMenu" Grid.Row="0" Grid.RowSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Lavender" IsMainMenu="True">
+            <MenuItem Header="File">
+                <MenuItem Header="New" Command="ApplicationCommands.New" >
                     
                 </MenuItem>
-                <MenuItem Header="Open">
+                <MenuItem Header="Open" Command="ApplicationCommands.Open">
                     
                 </MenuItem>
-                <MenuItem Header="Save">
+                <MenuItem Header="Save" Command="ApplicationCommands.Save">
                     
                 </MenuItem>
-                <MenuItem Header="Exit" Click="Exit_Click" >
+                <MenuItem Header="Save As" Command="ApplicationCommands.SaveAs">
+
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Recent Files">
+                    
+                </MenuItem> 
+                <Separator/>
+                <MenuItem Header="Exit" Command="ApplicationCommands.Close"  >
                     
                 </MenuItem>
             </MenuItem>
@@ -30,23 +56,33 @@
                 
             </MenuItem> 
             <MenuItem Header="View">
-                
-            </MenuItem>
-            <MenuItem Header="Simulation">
-                <MenuItem Header="Run">
+                <MenuItem Header="ToolBar">
                     
                 </MenuItem>
-                <MenuItem Header="Stop">
+                <MenuItem Header="StatusBar">
+                    
+                </MenuItem>
+                <MenuItem Header="Full Screen">
+                    
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="Simulation" >
+                <MenuItem Header="Run\Pause" Command="Soul:SCommands.Run" >
+                    
+                </MenuItem>
+                <MenuItem Header="Stop" Command="Soul:SCommands.Stop">
 
                 </MenuItem>
-                <MenuItem Header="Pause">
+                <Separator/>
+                <MenuItem Header="Step" Command="Soul:SCommands.Step">
 
                 </MenuItem>
-                <MenuItem Header="Resume">
-
+                <Separator/>
+                <MenuItem Header="Report Progress" IsCheckable="True" IsChecked="True" Command="Soul:SCommands.IsReportProgress">
+                    
                 </MenuItem>
-                <MenuItem Header="Step">
-
+                <MenuItem Header="Imaging" IsCheckable="True" IsChecked="True" Command="Soul:SCommands.IsImaging" >
+                    
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="Tools">
@@ -59,17 +95,37 @@
                 
             </MenuItem>
             <MenuItem Header="Help">
-                <MenuItem Header="Help">
+                <MenuItem Header="Help" Command="ApplicationCommands.Help">
                     
                 </MenuItem>
-                <MenuItem Header="About" Click="About_Click">
+                <Separator/>
+                <MenuItem Header="About Soul" Click="About_Click">
                     
                 </MenuItem> 
             </MenuItem>
         </Menu>
         
-        <ToolBar Name="MainToolBar" Grid.Row="1" Grid.RowSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-            
+        <ToolBar Name="MainToolBar" Grid.Row="1" Grid.RowSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Lavender">
+            <Button ToolTip="New">
+                <Image Source="Icons\new.ico"/>
+            </Button>
+            <Button ToolTip="Open">
+                <Image Source="Icons\open.ico"/>
+            </Button>
+            <Button ToolTip="Save">
+                <Image Source="Icons\save.ico"/>
+            </Button>
+            <Separator/>
+            <Button x:Name="RunPause" Command="Soul:SCommands.Run" ToolTip="Run/Pause Simulation">
+                <Image Source="Icons\play.ico"/>
+            </Button>
+            <Button x:Name="Stop" Command="Soul:SCommands.Stop" ToolTip="Stop Simulation" >
+                <Image Source="Icons\stop.ico"/>
+            </Button>
+            <Button x:Name="Step" Command="Soul:SCommands.Step" ToolTip="Step Simulation">
+                <Image Source="Icons\step.ico"/>
+            </Button>
+            <Separator/>
         </ToolBar>
         
         <TabControl Name="MainTab" Grid.Row="2" Grid.RowSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
@@ -87,12 +143,10 @@
             
         </TabControl>
         
-        <StatusBar Name="MainStatusBar" Grid.Row="3" Grid.RowSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-            <StatusBarItem >
-                <TextBlock>
-                status
-                </TextBlock>
-            </StatusBarItem>
+        <StatusBar Name="MainStatusBar" Grid.Row="3" Grid.RowSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Lavender">
+            <TextBlock Name="StatusText" HorizontalAlignment="Left">
+            Ready
+            </TextBlock>
         </StatusBar>  
         
     </Grid>

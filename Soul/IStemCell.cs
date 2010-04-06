@@ -14,12 +14,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Media.Media3D;
+using SCore;
 
-namespace SCore
+namespace Soul
 {
-    public static class SConstants
+    public interface IStemCell
     {
-        public const double AxonDelayMax = 20.0;
+        ICell Develop(NeuronType neurontype);
+        ICell Develop(INeuron neuron);
+        ModelVisual3D DevelopMophology(INeuron neuron);
     }
-
 }

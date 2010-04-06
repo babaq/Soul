@@ -14,6 +14,12 @@ module SSolver.CoreFunc
 
 open System
 
+let Gauss x l d =
+    Math.Exp(-(Math.Pow(x - 0.5 * l, 2.0)) / (2.0 * Math.Pow(d, 2.0)))
+    
+let Guass_Noise x u d =
+    u+Math.Sqrt(d)*x
+
 /// <summary>
 /// Heaviside Unit Step Function
 /// </summary>

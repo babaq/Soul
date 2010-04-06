@@ -15,13 +15,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Soul
+namespace SCore
 {
-    public enum ActionType
+    public static class GlobleSettings
     {
-        None,
-        Rotate,
-        Zoom,
-        Translate,
+        public static double AxonDelayMax = 20.0;
     }
+
 }

@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -31,17 +32,25 @@ namespace SCore
         private Point3D position;
         private Dictionary<Guid,ISynapse> weightsynapses;
         private IHillock hillock;
+        private double potential;
         private double output;
         private double lastoutput;
         private INetwork parentnetwork;
-        
+        private Derivative dynamicrule;
+        protected NeuronType type;
 
-        public MP(double threshold,double initoutput)
-            : this("MP",new Point3D(), new ThresholdHeaviside(null, threshold),initoutput)
+
+        public MP(double threshold, double initpotential)
+            : this("MP", threshold, initpotential)
         {
         }
 
-        public MP(string name,Point3D position, IHillock hillock,double initoutput)
+        public MP(string name,double threshold, double initpotential)
+            : this(name, new Point3D(), new ThresholdHeaviside(null, threshold), initpotential,0.0)
+        {
+        }
+
+        public MP(string name,Point3D position, IHillock hillock,double initpotential,double currentT)
         {
             id = Guid.NewGuid();
             this.name = name;
@@ -49,8 +58,11 @@ namespace SCore
             weightsynapses = new Dictionary<Guid,ISynapse>();
             this.hillock = hillock;
             this.hillock.HostNeuron = this;
-            output = lastoutput = initoutput;
+            potential = initpotential;
+            output = lastoutput = this.hillock.Fire(initpotential, currentT);
             parentnetwork =null;
+            dynamicrule = null;
+            type = NeuronType.MP;
         }
 
 
@@ -82,6 +94,12 @@ namespace SCore
         {
             get { return hillock; }
             set { hillock = value; }
+        }
+
+        public double Potential
+        {
+            get { return potential; }
+            set { potential = value; }
         }
 
         public double Output
@@ -209,8 +227,8 @@ namespace SCore
 
         public Derivative DynamicRule
         {
-            get { return null; }
-            set { }
+            get { return dynamicrule; }
+            set { dynamicrule = value; }
         }
 
         public event EventHandler Updated;
@@ -262,6 +280,21 @@ namespace SCore
 
         public virtual void UnRegisterSpike(EventHandler onspike)
         {
+        }
+
+        public NeuronType Type
+        {
+            get { return type; }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void NotifyPropertyChanged(string propertyname)
+        {
+            if(PropertyChanged!=null)
+            {
+                PropertyChanged(this,new PropertyChangedEventArgs(propertyname));
+            }
         }
 
         #endregion

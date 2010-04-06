@@ -23,7 +23,7 @@ namespace SCore
     {
         private double resetpotential;
         private double refractoryperiod;
-        private Queue<double> travalingspiketrain;
+        private Queue<double> travelingspiketrain;
 
 
         public ThresholdSpike(INeuron hostneuron, double threshold, double resetpotential, double refractoryperiod)
@@ -31,7 +31,7 @@ namespace SCore
         {
             this.resetpotential = resetpotential;
             this.refractoryperiod = refractoryperiod;
-            this.travalingspiketrain = new Queue<double>();
+            this.travelingspiketrain = new Queue<double>();
         }
 
 
@@ -43,7 +43,7 @@ namespace SCore
             }
             else
             {
-                travalingspiketrain.Enqueue(currentT);
+                travelingspiketrain.Enqueue(currentT);
                 FireSpike();
                 return resetpotential;
             }
@@ -61,29 +61,29 @@ namespace SCore
             set{refractoryperiod = value;}
         }
 
-        public override Queue<double> TravalingSpikeTrain
+        public override Queue<double> TravelingSpikeTrain
         {
-            get { return travalingspiketrain; }
+            get { return travelingspiketrain; }
         }
 
         public override bool IsInRefractoryPeriod(double currentT)
         {
-            if (travalingspiketrain.Count == 0)
+            if (travelingspiketrain.Count == 0)
             {
                 return false;
             }
-            if (currentT - travalingspiketrain.Last() > refractoryperiod)
+            if (currentT - travelingspiketrain.Last() > refractoryperiod)
             {
                 return false;
             }
             return true;
         }
 
-        public override void UpdateTravalingSpikeTrain(double currentT)
+        public override void UpdateTravelingSpikeTrain(double currentT)
         {
-            if(currentT-travalingspiketrain.Peek()>SConstants.AxonDelayMax)
+            if(currentT-travelingspiketrain.Peek()>GlobleSettings.AxonDelayMax)
             {
-                travalingspiketrain.Dequeue();
+                travelingspiketrain.Dequeue();
             }
         }
 

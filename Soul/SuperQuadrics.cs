@@ -38,25 +38,22 @@ namespace Soul
 
             for (int lat = 0; lat <= latitudedivision; lat++)
             {
-                double phi = Math.PI/2 - lat*(Math.PI/latitudedivision);
-                //double y = ry*Math.Sin(phi);
-                double y = ry *Math.Pow( Math.Sin(phi),ey);
-                //double xz = -ry*Math.Cos(phi);
+                double phi = lat * (Math.PI / latitudedivision) - Math.PI / 2;
+                var sinphi = Math.Sin(phi);
+                var cosphi = Math.Cos(phi);
+                double y = ry * Math.Sign(sinphi) * Math.Pow(Math.Abs(sinphi), ey);
 
                 for (int lon = 0; lon <= longitudedivision; lon++)
                 {
-                    //double theta = lon*(2*Math.PI/longitudedivision);
-                    double theta = lon * (2 * Math.PI / longitudedivision)-Math.PI;
-                    //double x = xz*Math.Sin(theta);
-                    //double z = xz*Math.Cos(theta);
-                    //double x = rx *Math.Cos(phi)* Math.Cos(theta);
-                    //double z = rz * Math.Cos(phi)*Math.Sin(theta);
-                    double x = rx *Math.Pow( Math.Cos(phi),ex) *Math.Pow( Math.Cos(theta),ex);
-                    double z = rz *Math.Pow( Math.Cos(phi),ez) *Math.Pow( Math.Sin(theta),ez);
+                    double theta = lon * (2 * Math.PI / longitudedivision) - Math.PI;
+                    var costheta = Math.Cos(theta);
+                    var sintheta = Math.Sin(theta);
+                    double x = rx * Math.Sign(cosphi) * Math.Pow(Math.Abs(cosphi), ex) * Math.Sign(costheta) * Math.Pow(Math.Abs(costheta), ex);
+                    double z = rz * Math.Sign(cosphi) * Math.Pow(Math.Abs(cosphi), ez) * Math.Sign(sintheta) * Math.Pow(Math.Abs(sintheta), ez);
 
                     mesh.Positions.Add(new Point3D(x, y, z));
                     mesh.Normals.Add(new Vector3D(x, y, z));
-                    mesh.TextureCoordinates.Add(new Point((double) lon/longitudedivision, (double) lat/latitudedivision));
+                    mesh.TextureCoordinates.Add(new Point((double)lon / longitudedivision, (double)lat / latitudedivision));
                 }
             }
 
@@ -64,19 +61,19 @@ namespace Soul
             {
                 for (int lon = 0; lon < longitudedivision; lon++)
                 {
-                    if (lat != 0)
-                    {
-                        mesh.TriangleIndices.Add((lat + 0) * (longitudedivision + 1) + lon);
-                        mesh.TriangleIndices.Add((lat + 1) * (longitudedivision + 1) + lon);
-                        mesh.TriangleIndices.Add((lat + 0) * (longitudedivision + 1) + lon + 1);
-                    }
+                    var upleft = lat * (longitudedivision + 1) + lon;
+                    var downleft = upleft + (longitudedivision + 1);
+                    var upright = upleft + 1;
+                    var downright = downleft + 1;
 
-                    if (lat != latitudedivision - 1)
-                    {
-                        mesh.TriangleIndices.Add((lat + 0) * (longitudedivision + 1) + lon + 1);
-                        mesh.TriangleIndices.Add((lat + 1) * (longitudedivision + 1) + lon);
-                        mesh.TriangleIndices.Add((lat + 1) * (longitudedivision + 1) + lon + 1);
-                    }
+                    mesh.TriangleIndices.Add(upleft);
+                    mesh.TriangleIndices.Add(downleft);
+                    mesh.TriangleIndices.Add(upright);
+
+                    mesh.TriangleIndices.Add(upright);
+                    mesh.TriangleIndices.Add(downleft);
+                    mesh.TriangleIndices.Add(downright);
+
                 }
             }
 
@@ -85,7 +82,12 @@ namespace Soul
 
         public static MeshGeometry3D Ellipsoid(double rx, double ry, double rz, int longitudedivision, int latitudedivision)
         {
-            return GetSuperQuadric(rx,  ry,  rz, 1.0, 1.0, 1.0,  longitudedivision,  latitudedivision);
+            return GetSuperQuadric(rx, ry, rz, 1.0, 1.0, 1.0, longitudedivision, latitudedivision);
+        }
+
+        public static MeshGeometry3D Sphere(double r, int longitudedivision, int latitudedivision)
+        {
+            return Ellipsoid(r, r, r, longitudedivision, latitudedivision);
         }
 
     }

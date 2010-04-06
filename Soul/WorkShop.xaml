@@ -2,32 +2,57 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Height="Auto" Width="Auto">
-    <DockPanel Name="WorkShopDock" Background="Black" >
-        <StackPanel Height="Auto" Name="PartsPanel" Width="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
+    <Grid Name="WorkShopGrid" Background="#323232" >
+        <StackPanel Height="Auto" Name="PartPanel" Width="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
             <Button Height="37" Name="button2" Width="25">Button</Button>
             <Button Height="37" Name="button1" Width="25">Button</Button>
          </StackPanel>
         
         <Viewport3D x:Name="Space" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Viewport3D.Camera>
-                <PerspectiveCamera x:Name="Camera"  Position="0,0.5,10" LookDirection="0,0,-10" UpDirection="0,1,0" FieldOfView="45" NearPlaneDistance="1" FarPlaneDistance="10000" />
-            </Viewport3D.Camera>            
-            <ModelVisual3D x:Name="ModelVisual">
+                <PerspectiveCamera x:Name="Camera"  Position="0,0,10" LookDirection="0,0,-10" UpDirection="0,1,0" FieldOfView="45" NearPlaneDistance="1" FarPlaneDistance="10000" />
+            </Viewport3D.Camera>
+            <ModelVisual3D x:Name="LightVisual">
                 <ModelVisual3D.Content>
-                    <Model3DGroup x:Name="ModelGroup">
-                        <PointLight x:Name="PointLight01" Color="White" Position="0,0,0" Range="10" ConstantAttenuation="1">
+                    <Model3DGroup x:Name="LightGroup">
+                        <PointLight x:Name="PointLight01" >
                         </PointLight>
                         <SpotLight x:Name="SpotLight01" >
                         </SpotLight>
-                        <DirectionalLight x:Name="DirectionalLight01">
+                        <DirectionalLight x:Name="DirectionalLight01" Color="White" Direction="1,1,-10">
                         </DirectionalLight>
-                        <AmbientLight x:Name="AmbientLight01">
+                        <DirectionalLight x:Name="DirectionalLight02" Color="White" Direction="-1,-1,10">
+                        </DirectionalLight>
+                        <AmbientLight x:Name="AmbientLight01" Color="Black" >
                         </AmbientLight>
-                        
                     </Model3DGroup>
                 </ModelVisual3D.Content>
             </ModelVisual3D>
             
+            <ModelVisual3D x:Name="ModelVisual">
+            </ModelVisual3D>
+            
       </Viewport3D>
-    </DockPanel>
+
+        <StackPanel Height="Auto" Width="Auto"  HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Horizontal">
+            <TextBox x:Name="DeltaTBox" Width="Auto" TextAlignment="Center" ToolTip="DeltaT(ms)" >0.05
+            </TextBox>
+            <TextBox x:Name="DurationTBox" Width="Auto" TextAlignment="Center" ToolTip="DurationT(ms)" >20.00
+            </TextBox>
+            <TextBox x:Name="CurrentTBox" Width="Auto" TextAlignment="Center" ToolTip="CurrentT(ms)" >0.00
+            </TextBox>
+            <ComboBox x:Name="RecordTypeBox" Width="Auto"  SelectedIndex="0" ToolTip="Record Type" >
+                <TextBlock>None</TextBlock>
+                <TextBlock>All</TextBlock>
+                <TextBlock>Potential</TextBlock>
+                <TextBlock>Spike</TextBlock>
+            </ComboBox>
+        </StackPanel>
+        
+        <StackPanel Height="Auto" Width="Auto"  HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <ProgressBar x:Name="ProgressBar" Width="130" Height="20" Visibility="Hidden" Minimum="0" Maximum="1" >
+            </ProgressBar>
+        </StackPanel>
+
+    </Grid>
 </UserControl>

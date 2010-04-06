@@ -30,18 +30,24 @@ namespace SCore
         private double restpotential;
 
 
-        public LI(double threshold, double initoutput, double r,double c,double restpotential)
-            : this("LI",new Point3D(), new ThresholdSigmoid(null, threshold), initoutput, r,c,restpotential)
+        public LI(double threshold, double initpotential, double r, double c, double restpotential)
+            : this("LI", threshold, initpotential, r, c, restpotential)
         {
         }
 
-        public LI(string name, Point3D position, IHillock hillock, double initoutput, double r, double c,double restpotential)
-            : base(name, position, hillock, initoutput)
+        public LI(string name,double threshold, double initpotential, double r, double c, double restpotential)
+            : this(name, new Point3D(), new ThresholdSigmoid(null, threshold), initpotential, r, c, restpotential,0.0)
+        {
+        }
+
+        public LI(string name, Point3D position, IHillock hillock, double initpotential, double r, double c, double restpotential,double currentT)
+            : base(name, position, hillock, initpotential,currentT)
         {
             this.r = r;
             this.c = c;
             this.restpotential = restpotential;
             DynamicRule = CoreFunc.dLI;
+            type = NeuronType.LI;
         }
 
 
@@ -71,8 +77,8 @@ namespace SCore
                 sigma += Synapses.ElementAt(i).Value.Release(deltaT, currentT);
             }
             var dynamicruleparam = new double[] {Tao,RestPotential, sigma};
-            sigma = solver.Solve(deltaT, currentT, LastOutput, dynamicruleparam, DynamicRule);
-            Output = Hillock.Fire(sigma,currentT);
+            Potential = solver.Solve(deltaT, currentT, Potential, dynamicruleparam, DynamicRule);
+            Output = Hillock.Fire(Potential, currentT);
             RaiseUpdated();
         }
 

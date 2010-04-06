@@ -25,8 +25,8 @@ namespace SCore
         double ResetPotential { set; get; }
         double RefractoryPeriod { set; get; }
         bool IsInRefractoryPeriod(double currentT);
-        Queue<double > TravalingSpikeTrain{ get;}
-        void UpdateTravalingSpikeTrain(double currentT);
+        Queue<double > TravelingSpikeTrain{ get;}
+        void UpdateTravelingSpikeTrain(double currentT);
         event EventHandler Spike;
         void FireSpike();
     }

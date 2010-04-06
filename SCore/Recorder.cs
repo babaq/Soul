@@ -64,7 +64,7 @@ namespace SCore
         {
             if (recordtype != RecordType.None)
             {
-                var file=recordfile + "_" + DateTime.Now.ToString("yyyy-MM-d_HH-mm-ss");
+                var file=recordfile+hostsimulator.Network.Name + "_" + DateTime.Now.ToString("yyyy-MM-d_HH-mm-ss");
                 if(recordtype==RecordType.Potential || recordtype==RecordType.All)
                 {
                     potentialfile = new FileStream(file + "_v.txt", FileMode.Append, FileAccess.Write);
@@ -110,13 +110,27 @@ namespace SCore
         public virtual void RecordOnUpdated(object sender, EventArgs e)
         {
             var neuron = sender as INeuron;
-            potentialwriter.WriteLine(hostsimulator.CurrentT.ToString("F3") + "\t"+ neuron.Output.ToString("F3") + "\t" + neuron.ID.ToString("N"));
+            try
+            {
+                potentialwriter.WriteLine(hostsimulator.CurrentT.ToString("F3") + "\t" + neuron.Output.ToString("F3") + "\t" + neuron.ID.ToString("N"));
+            }
+            catch (Exception ex)
+            {
+                potentialwriter.WriteLine(ex.Message);
+            }
         }
 
         public virtual void RecordOnSpike(object sender, EventArgs e)
         {
             var neuron = sender as INeuron;
-            spikewriter.WriteLine(hostsimulator.CurrentT.ToString("F3") + "\t" + neuron.ID.ToString("N"));
+            try
+            {
+                spikewriter.WriteLine(hostsimulator.CurrentT.ToString("F3") + "\t" + neuron.ID.ToString("N"));
+            }
+            catch (Exception ex)
+            {
+                spikewriter.WriteLine(ex.Message);
+            }
         }
 
         public void Save(INetwork network, string file)

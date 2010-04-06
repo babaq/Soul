@@ -25,15 +25,21 @@ namespace SCore
     [Serializable]
     public class IF : LI
     {
-        public IF(double threshold,double resetpotential, double refractoryperiod, double initoutput, double r, double c,double restpotential)
-            : this("IF",new Point3D(),new ThresholdSpike(null,threshold,resetpotential,refractoryperiod), initoutput, r, c,restpotential)
+        public IF(double threshold, double resetpotential, double refractoryperiod, double initpotential, double r, double c, double restpotential)
+            : this("IF", threshold, resetpotential, refractoryperiod, initpotential, r, c, restpotential)
         {
         }
 
-        public IF(string name,Point3D position, IHillock hillock, double initoutput, double r, double c,double restpotential)
-            : base(name, position, hillock, initoutput, r,c,restpotential)
+        public IF(string name,double threshold, double resetpotential, double refractoryperiod, double initpotential, double r, double c, double restpotential)
+            : this(name, new Point3D(), new ThresholdSpike(null, threshold, resetpotential, refractoryperiod), initpotential, r, c, restpotential,0.0)
+        {
+        }
+
+        public IF(string name, Point3D position, IHillock hillock, double initpotential, double r, double c, double restpotential, double currentT)
+            : base(name, position, hillock, initpotential, r, c, restpotential,currentT)
         {
             DynamicRule = CoreFunc.dIF;
+            type = NeuronType.IF;
         }
 
 
@@ -47,10 +53,10 @@ namespace SCore
                     sigma += Synapses.ElementAt(i).Value.Release(deltaT, currentT);
                 }
                 var dynamicruleparam = new double[] {Tao, R, RestPotential, sigma};
-                sigma = solver.Solve(deltaT, currentT, LastOutput, dynamicruleparam, DynamicRule);
-                Output = Hillock.Fire(sigma, currentT);
-                RaiseUpdated();
+                Potential = solver.Solve(deltaT, currentT, Potential, dynamicruleparam, DynamicRule);
+                Output = Hillock.Fire(Potential, currentT);
             }
+            RaiseUpdated();
         }
 
         public override void RegisterSpike(EventHandler onspike)

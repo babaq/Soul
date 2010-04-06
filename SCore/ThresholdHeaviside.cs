@@ -68,12 +68,12 @@ namespace SCore
             return false;
         }
 
-        public virtual Queue<double > TravalingSpikeTrain
+        public virtual Queue<double > TravelingSpikeTrain
         {
             get { return null; }
         }
 
-        public virtual void UpdateTravalingSpikeTrain(double currentT)
+        public virtual void UpdateTravelingSpikeTrain(double currentT)
         {
         }
 

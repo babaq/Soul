@@ -14,14 +14,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Media.Media3D;
+using SCore;
 
 namespace Soul
 {
-    public enum ActionType
+    public interface ICell
     {
-        None,
-        Rotate,
-        Zoom,
-        Translate,
+        INeuron Neuron { get; set; }
+        ModelVisual3D Mophology { get; set; }
     }
 }
