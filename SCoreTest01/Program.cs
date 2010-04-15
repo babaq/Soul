@@ -50,8 +50,8 @@ namespace SCoreTest01
 
         static void InitMP()
         {
-            var mp0 = new MP(0.3, 1.0) { ParentNetwork = network };
-            var mp1 = new MP(0.5, 0.0);
+            var mp0 = new MP(0.3, 1.0) {ParentNetwork = network, Position = new Point3D(-1, 0, 0)};
+            var mp1 = new MP(0.5, 0.0) {Position = new Point3D(1, 0, 0)};
             mp0.ProjectTo(mp1, new WeightSynapse(mp0, 0.6));
             mp0.ProjectedFrom(mp1, new WeightSynapse(mp1, 0.8));
             mp0.ProjectTo(mp0, new WeightSynapse(mp0, 0.2));
@@ -135,7 +135,7 @@ namespace SCoreTest01
                     var ind = i + j;
                     if (ind >= 0 && ind < N && i != ind)
                     {
-                        Es[i].ProjectedFrom(Es[ind], new SpikeWeightSynapse(Es[ind], 1000 * CoreFunc.Gauss((j + 1), W, 3), 1));
+                        Es[i].ProjectedFrom(Es[ind], new SpikeWeightSynapse(Es[ind], 1000 * CoreFunc.Gauss((j + 1), 3, 3), 1));
                     }
 
                 }
@@ -147,7 +147,7 @@ namespace SCoreTest01
             for (int i = 3; i < 7; i++)
             {
 
-                Es[i].ProjectedFrom(Es_Input, new SpikeWeightSynapse(Es_Input, 1000 * CoreFunc.Gauss((i - 3), W, 3),0.5));
+                Es[i].ProjectedFrom(Es_Input, new SpikeWeightSynapse(Es_Input, 1000 * CoreFunc.Gauss((i - 4.5),0, 3),0.5));
             }
 
             //for (int i = 5; i < 15; i++)
@@ -170,13 +170,13 @@ namespace SCoreTest01
         static void OnUpdated(object sender, EventArgs e)
         {
             var neuron = sender as INeuron;
-            Console.WriteLine(simulator.CurrentT.ToString("F3") + " " + neuron.Output.ToString("F3") + " " + neuron.ID.ToString("N"));
+            Console.WriteLine(simulator.CurrentT.ToString("F3") + "\t" + neuron.Output.ToString("F3") + "\t" + neuron.ID.ToString("N"));
         }
 
         static void OnSpike(object sender, EventArgs e)
         {
             var neuron = sender as INeuron;
-            Console.WriteLine(simulator.CurrentT.ToString("F3") + " " + neuron.ID.ToString("N"));
+            Console.WriteLine(simulator.CurrentT.ToString("F3") + "\t" + neuron.ID.ToString("N"));
         }
 
         static void Main(string[] args)

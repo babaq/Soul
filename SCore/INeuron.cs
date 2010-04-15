@@ -50,6 +50,7 @@ namespace SCore
         void UnRegisterSpike(EventHandler onspike);
         NeuronType Type { get; }
         void NotifyPropertyChanged(string propertyname);
+        string Summary { get; }
     }
 
 

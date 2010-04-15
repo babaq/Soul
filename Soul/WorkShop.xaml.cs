@@ -38,7 +38,11 @@ namespace Soul
     public partial class WorkShop : UserControl
     {
         public bool IsReportProgress { get; set; }
-        public bool IsImaging { get; set; }
+        public bool IsImaging
+        {
+            get { return CellNet.IsPushing; }
+            set { CellNet.IsPushing = value; }
+        }
         public bool IsRunning { get { return simulator.IsRunning; } }
         public bool IsPaused { get { return simulator.IsPaused; } }
         private ISimulation simulator;
@@ -60,9 +64,8 @@ namespace Soul
                 }
             }
         }
-        public INetwork Network { get; set; }
-        public ISolver Solver { get; set; }
-        public IRecord Recorder { get; set; }
+        public ICellNet CellNet { get; set; }
+        public static readonly IStemCell StemCell=new StemCell();
 
         public ActionType ActionType { get; set; }
         public Point PreviousMousePoint { get; set; }
@@ -76,18 +79,17 @@ namespace Soul
         {
             InitializeComponent();
 
-
-            Network = new Network();
-            Solver = new ODESolver();
-            Recorder = new Recorder(Simulator, RecordType.None, "Soul");
-            Simulator = new Simulator(0.05, 2000, Network, Solver, Recorder);
+            var network = new Network();
+            var solver = new ODESolver();
+            var recorder = new Recorder(Simulator, RecordType.None, "Soul");
+            Simulator = new Simulator(0.01, 50, network, solver, recorder);
             IsReportProgress = true;
+            CellNet = new CellNet(network);
             IsImaging = true;
-
-
+            
             var transformGroup = new Transform3DGroup();
             TranslateTransform = new TranslateTransform3D();
-            RotateTransform = new RotateTransform3D {Rotation = new QuaternionRotation3D()};
+            RotateTransform = new RotateTransform3D (new QuaternionRotation3D());
             ScaleTransform = new ScaleTransform3D();
             transformGroup.Children.Add(TranslateTransform);
             transformGroup.Children.Add(RotateTransform);
@@ -108,112 +110,39 @@ namespace Soul
 
         void init()
         {
+            //var mp0 = new MP(0.3, 1.0) { ParentNetwork = simulator.Network };
+            //var mp1 = new MP(0.5, 0.0);
+            //mp0.ProjectTo(mp1, new WeightSynapse(mp0, 0.6));
+            //mp0.ProjectedFrom(mp1, new WeightSynapse(mp1, 0.8));
+            //mp0.ProjectTo(mp0, new WeightSynapse(mp0, 0.2));
+            //mp1.ProjectTo(mp1, new WeightSynapse(mp1, 0.4));
 
-            
+            var li0 = new LI(-50, -54, 5, 2, -60) { ParentNetwork = simulator.Network };
+            var li1 = new LI(-50, -55, 5, 2, -60);
+            li0.ProjectTo(li1, new WeightSynapse(li0, 0.8));
+            li0.ProjectedFrom(li1, new WeightSynapse(li1, 0.6));
+            li0.ProjectTo(li0, new WeightSynapse(li0, 0.3));
+            li1.ProjectTo(li1, new WeightSynapse(li1, 0.5));
 
-
-        var mp0 = new MP(0.3, 1.0) { ParentNetwork = Network };
-            var mp1 = new MP(0.5, 0.0);
-            mp0.ProjectTo(mp1, new WeightSynapse(mp0, 0.6));
-            mp0.ProjectedFrom(mp1, new WeightSynapse(mp1, 0.8));
-            mp0.ProjectTo(mp0, new WeightSynapse(mp0, 0.2));
-            mp1.ProjectTo(mp1, new WeightSynapse(mp1, 0.4));
-
-            var stemcell = new StemCell();
-            var cell0 = stemcell.Develop(mp0);
-            var cell1 = stemcell.Develop(mp1);
+            //var cell0 = StemCell.Develop(mp0);
+            //var cell1 = StemCell.Develop(mp1);
+            var cell0 = StemCell.Develop(li0);
+            var cell1 = StemCell.Develop(li1);
             cell1.Mophology.Transform = new TranslateTransform3D(2, 0, 0);
 
             ModelVisual.Children.Add(cell0.Mophology);
             ModelVisual.Children.Add(cell1.Mophology);
-
-
-
-            var b = new Binding { Source = simulator, Path = new PropertyPath("Progress"), Mode = BindingMode.OneWay };
-            ProgressBar.SetBinding(RangeBase.ValueProperty, b);
-
-            //ModelGroup.Children.Concat(cell1.Mophology);
-            //ModelGroup.Children.Add(cell1.Mophology[0]);
-            //ModelGroup.Children.Concat(cell1.Mophology);
-
-            //var mg = new MaterialGroup();
-            //mg.Children.Add(new DiffuseMaterial(Brushes.DarkGoldenrod));
-            //mg.Children.Add(new SpecularMaterial(Brushes.White, 1000.0));
-            //mg.Children.Add(new EmissiveMaterial(Brushes.Red));
-            ////ModelGroup.Children.Add(new GeometryModel3D(Ellipsoid.GetEllipsoid(1.5, 1.3, 1, 5), mg));
-            //var t = new GeometryModel3D(Ellipsoid.Mesh, mg);
-            //t.Transform = new TranslateTransform3D(3, 0, 0);
-            //var tt = t.Clone();
-            //tt.Transform = new TranslateTransform3D(-3, 0, 0);
-            //var tmg = mg.Clone();
-            //tmg.Children.Add(new DiffuseMaterial(new ImageBrush(new BitmapImage(new Uri(@"E:\Programs\Soul\Soul\Soul.png")))));
-            //var t1 = new GeometryModel3D(SuperQuadrics.GetSuperQuadric(1, 1, 1, 2.5, 0.001, 1, 36, 18), tmg);
-            //t1.Transform = new TranslateTransform3D(-3, 0, 0);
-            //var t2 = new GeometryModel3D(Ellipsoid.Octahedron(1, 1, 1), mg);
-            //t2.Transform = new TranslateTransform3D(0, 0, -3);
-            //var t3 = new GeometryModel3D(Cylinder.Mesh, mg);
-            //t3.Transform = new TranslateTransform3D(0, 0, 3);
-            //var t4 = new GeometryModel3D(Cylinder.GetCylinder(0.3, 2, 1, 16), mg);
-            //t4.Transform = new TranslateTransform3D(0, 3, 0);
-            //ModelGroup.Children.Add(t);
-            //ModelGroup.Children.Add(tt);
-            //ModelGroup.Children.Add(t1);
-            //ModelGroup.Children.Add(t2);
-            //ModelGroup.Children.Add(t3);
-            //ModelGroup.Children.Add(t4);
         }
 
-
-
-
-        void OnRunOver(object sender, EventArgs e)
+        public void LoadNetwork(INetwork network)
         {
-            if (!Dispatcher.CheckAccess())
-            {
-                Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action) delegate
-                                                                               {
-                                                                                   ProgressBar.Visibility = Visibility.Hidden;
-                                                                                   CurrentTBox.Text = simulator.CurrentT.ToString("F2");
-                                                                               });
-            }
-            else
-            {
-                ProgressBar.Visibility = Visibility.Hidden;
-                CurrentTBox.Text = simulator.CurrentT.ToString("F2");
-            }
+            Simulator.Network = network;
+            CellNet = StemCell.Develop(network);
+            ModelVisual.Children.Clear();
+            ModelVisual.Children.Add(CellNet.Mophology);
         }
 
-        void OnSteped(object sender, EventArgs e)
-        {
-            if (IsReportProgress)
-            {
-                var stor = sender as ISimulation;
-                if (stor != null)
-                {
-                    if (!Dispatcher.CheckAccess())
-                    {
-                        Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate
-                                                                                  {
-                                                                                      ProgressBar.Value = stor.Progress;
-                                                                                  });
-                    }
-                    else
-                    {
-                        ProgressBar.Value = stor.Progress;
-                    }
-                }
-            }
-
-            //var stor = sender as ISimulation;
-            //if (stor != null)
-            //{
-            //    Dispatcher.BeginInvoke(DispatcherPriority.Render, (Action)delegate
-            //                                                             {
-            //                                                                 ProgressBar.Value = stor.Progress;
-            //                                                             });
-            //}
-
-        }
+        #region Viewport3D Interactive
 
         void WorkShop_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -268,6 +197,7 @@ namespace Soul
                 if (axis.LengthSquared > 0)
                 {
                     var rotation = RotateTransform.Rotation as QuaternionRotation3D;
+                    
                     if (rotation != null)
                     {
                         rotation.Quaternion = new Quaternion(axis, angle) * rotation.Quaternion;
@@ -286,6 +216,7 @@ namespace Soul
 
                 var deltaVector = new Vector3D(deltaX, deltaY, 0);
                 var rotation = (QuaternionRotation3D)RotateTransform.Rotation;
+
                 var matrix = new Matrix3D();
                 matrix.Rotate(rotation.Quaternion);
                 matrix.Invert();
@@ -336,6 +267,49 @@ namespace Soul
             return new Vector3D(x, y, z);
         }
 
+        #endregion
+
+        #region Simulation Control
+
+        void OnRunOver(object sender, EventArgs e)
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action)delegate
+                {
+                    ProgressBar.Visibility = Visibility.Hidden;
+                    CurrentTBox.Text = simulator.CurrentT.ToString("F2");
+                });
+            }
+            else
+            {
+                ProgressBar.Visibility = Visibility.Hidden;
+                CurrentTBox.Text = simulator.CurrentT.ToString("F2");
+            }
+        }
+
+        void OnSteped(object sender, EventArgs e)
+        {
+            if (IsReportProgress)
+            {
+                var stor = sender as ISimulation;
+                if (stor != null)
+                {
+                    if (!Dispatcher.CheckAccess())
+                    {
+                        Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate
+                        {
+                            ProgressBar.Value = stor.Progress;
+                        });
+                    }
+                    else
+                    {
+                        ProgressBar.Value = stor.Progress;
+                    }
+                }
+            }
+        }
+
         public void Run()
         {
             simulator.DeltaT = Convert.ToDouble(DeltaTBox.Text);
@@ -351,8 +325,12 @@ namespace Soul
 
         public void Stop()
         {
+            var isp = IsReportProgress;
+            var isi = IsImaging;
             StopPushing();
             simulator.Stop();
+            IsReportProgress = isp;
+            IsImaging = isi;
         }
 
         public void Pause()
@@ -367,15 +345,21 @@ namespace Soul
 
         public void Step()
         {
+            var isp = IsReportProgress;
+            IsReportProgress = false;
             simulator.Step(Convert.ToDouble(DeltaTBox.Text));
             CurrentTBox.Text = simulator.CurrentT.ToString("F2");
+            IsReportProgress = isp;
         }
 
         public void StopPushing()
         {
             IsReportProgress = false;
+            IsImaging = false;
             Thread.Sleep(200);
         }
+
+        #endregion
 
     }
 }

@@ -36,5 +36,6 @@ namespace SCore
         void UnRegisterSpike(EventHandler onspike);
         void RaiseUpdated();
         string Summary{ get;}
+        INetwork CreateInstance();
     }
 }

@@ -2,10 +2,21 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Height="Auto" Width="Auto">
+    
+    <UserControl.Resources>
+        <Image x:Key="selectico" Source="Icons\select.png"/>
+        <Image x:Key="scmico" Source="Icons\scm.png"/>
+        <Image x:Key="mcmico" Source="Icons\mcm.png"/>
+    </UserControl.Resources>
+    
     <Grid Name="WorkShopGrid" Background="#323232" >
         <StackPanel Height="Auto" Name="PartPanel" Width="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
-            <Button Height="37" Name="button2" Width="25">Button</Button>
-            <Button Height="37" Name="button1" Width="25">Button</Button>
+            <ToggleButton x:Name="Select" Width="32" Height="32" ToolTip="Select" Background="Gray" Content="{StaticResource selectico}">
+            </ToggleButton>
+            <ToggleButton x:Name="SCM" Width="32" Height="32" ToolTip="Single Compartment Model" Background="Gray" Content="{StaticResource scmico}">
+            </ToggleButton>
+            <ToggleButton x:Name="MCM" Width="32" Height="32" ToolTip="Multiple Compartment Model" Background="Gray" Content="{StaticResource mcmico}">
+            </ToggleButton>
          </StackPanel>
         
         <Viewport3D x:Name="Space" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -15,16 +26,8 @@
             <ModelVisual3D x:Name="LightVisual">
                 <ModelVisual3D.Content>
                     <Model3DGroup x:Name="LightGroup">
-                        <PointLight x:Name="PointLight01" >
-                        </PointLight>
-                        <SpotLight x:Name="SpotLight01" >
-                        </SpotLight>
-                        <DirectionalLight x:Name="DirectionalLight01" Color="White" Direction="1,1,-10">
+                        <DirectionalLight x:Name="DirectionalLight01" Color="White" Direction="1,1,-10" >
                         </DirectionalLight>
-                        <DirectionalLight x:Name="DirectionalLight02" Color="White" Direction="-1,-1,10">
-                        </DirectionalLight>
-                        <AmbientLight x:Name="AmbientLight01" Color="Black" >
-                        </AmbientLight>
                     </Model3DGroup>
                 </ModelVisual3D.Content>
             </ModelVisual3D>

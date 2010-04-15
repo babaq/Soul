@@ -10,7 +10,7 @@
         <CommandBinding Command="ApplicationCommands.Close" Executed="Close_Executed" />
         <CommandBinding Command="ApplicationCommands.Help" Executed="Help_Executed"/>
         
-        <CommandBinding Command="Soul:SCommands.Run" Executed="Run_Executed"/>
+        <CommandBinding Command="Soul:SCommands.Run" Executed="Run_Executed" CanExecute="Run_CanExecute"/>
         <CommandBinding Command="Soul:SCommands.Stop" Executed="Stop_Executed"/>
         <CommandBinding Command="Soul:SCommands.Step" Executed="Step_Executed" CanExecute="Step_CanExecute" />
         <CommandBinding Command="Soul:SCommands.IsReportProgress" Executed="IsReportProgress_Executed"/>
@@ -20,6 +20,16 @@
         <KeyBinding Command="Soul:SCommands.Run" Key="F5"/>
         <KeyBinding Command="Soul:SCommands.Step" Key="F6"/>
     </Window.InputBindings>
+    
+    <Window.Resources>
+        <Image x:Key="newico" Source="Icons\new.ico"/>
+        <Image x:Key="openico" Source="Icons\open.ico"/>
+        <Image x:Key="saveico" Source="Icons\save.ico"/>
+        <Image x:Key="playico" Source="Icons\play.ico"/>
+        <Image x:Key="pauseico" Source="Icons\pause.ico"/>
+        <Image x:Key="stopico" Source="Icons\stop.ico"/>
+        <Image x:Key="stepico" Source="Icons\step.ico"/>
+    </Window.Resources>
     
     <Grid>
         <Grid.RowDefinitions>
@@ -67,7 +77,7 @@
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="Simulation" >
-                <MenuItem Header="Run\Pause" Command="Soul:SCommands.Run" >
+                <MenuItem Header="Run\Pause" Command="Soul:SCommands.Run">
                     
                 </MenuItem>
                 <MenuItem Header="Stop" Command="Soul:SCommands.Stop">
@@ -106,24 +116,18 @@
         </Menu>
         
         <ToolBar Name="MainToolBar" Grid.Row="1" Grid.RowSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Lavender">
-            <Button ToolTip="New">
-                <Image Source="Icons\new.ico"/>
+            <Button ToolTip="New" Command="ApplicationCommands.New" Content="{StaticResource newico}">
             </Button>
-            <Button ToolTip="Open">
-                <Image Source="Icons\open.ico"/>
+            <Button ToolTip="Open" Command="ApplicationCommands.Open" Content="{StaticResource openico}">
             </Button>
-            <Button ToolTip="Save">
-                <Image Source="Icons\save.ico"/>
+            <Button ToolTip="Save" Command="ApplicationCommands.Save" Content="{StaticResource saveico}">
             </Button>
             <Separator/>
-            <Button x:Name="RunPause" Command="Soul:SCommands.Run" ToolTip="Run/Pause Simulation">
-                <Image Source="Icons\play.ico"/>
+            <Button x:Name="RunPause" Command="Soul:SCommands.Run" ToolTip="Run Simulation" Content="{StaticResource playico}">
             </Button>
-            <Button x:Name="Stop" Command="Soul:SCommands.Stop" ToolTip="Stop Simulation" >
-                <Image Source="Icons\stop.ico"/>
+            <Button x:Name="Stop" Command="Soul:SCommands.Stop" ToolTip="Stop Simulation" Content="{StaticResource stopico}">
             </Button>
-            <Button x:Name="Step" Command="Soul:SCommands.Step" ToolTip="Step Simulation">
-                <Image Source="Icons\step.ico"/>
+            <Button x:Name="Step" Command="Soul:SCommands.Step" ToolTip="Step Simulation" Content="{StaticResource stepico}">
             </Button>
             <Separator/>
         </ToolBar>

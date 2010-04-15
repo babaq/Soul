@@ -34,8 +34,8 @@ namespace Soul
             INeuron neuron = null;
             switch (neurontype)
             {
-                case NeuronType.MP:
-                    neuron = new MP(0.5, 1);
+                default:
+                    neuron = new MP(0.5, 1.0);
                     break;
             }
 
@@ -51,6 +51,29 @@ namespace Soul
 
             var cell = new Cell(neuron, DevelopMophology(neuron));
             return cell;
+        }
+
+        public ICellNet Develop(INetwork network)
+        {
+            if(network==null)
+            {
+                return null;
+            }
+
+            var cellnet = new CellNet(network);
+            for (int i = 0; i < cellnet.Network.Neurons.Count; i++)
+            {
+                var cell = Develop(cellnet.Network.Neurons.ElementAt(i).Value);
+                cellnet.Cells.Add(cell.Neuron.ID,cell);
+                cellnet.Mophology.Children.Add(cell.Mophology);
+            }
+            for (int i = 0; i <cellnet.Network.ChildNetworks.Count; i++)
+            {
+                var childcellnet = Develop(cellnet.Network.ChildNetworks.ElementAt(i).Value);
+                cellnet.ChildCellNet.Add(childcellnet.Network.ID,childcellnet);
+                cellnet.Mophology.Children.Add(childcellnet.Mophology);
+            }
+            return cellnet;
         }
 
         public ModelVisual3D DevelopMophology(INeuron neuron)
@@ -91,6 +114,9 @@ namespace Soul
             MaterialGroup mg = new MaterialGroup();
             switch (neuron.Type)
             {
+                case NeuronType.LI:
+                case NeuronType.IF:
+                case NeuronType.HH:
                 case NeuronType.MP:
                     var brush = new SolidColorBrush();
 

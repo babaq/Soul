@@ -23,6 +23,7 @@ namespace Soul
     {
         ICell Develop(NeuronType neurontype);
         ICell Develop(INeuron neuron);
+        ICellNet Develop(INetwork network);
         ModelVisual3D DevelopMophology(INeuron neuron);
     }
 }

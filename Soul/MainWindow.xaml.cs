@@ -23,6 +23,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Win32;
 using SCore;
 
 namespace Soul
@@ -37,6 +38,64 @@ namespace Soul
             InitializeComponent();
         }
 
+
+        private void Open_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (MainTab != null)
+            {
+                var currenttabcontent = MainTab.SelectedContent;
+                if (currenttabcontent != null)
+                {
+                    if (currenttabcontent.GetType() == typeof (WorkShop))
+                    {
+                        var currentworkshop = currenttabcontent as WorkShop;
+                        var ofd = new OpenFileDialog();
+                        ofd.AddExtension = true;
+                        ofd.DefaultExt = "network";
+                        ofd.Title = "Opening Neural Network ...";
+                        ofd.InitialDirectory = Environment.CurrentDirectory;
+                        ofd.CheckFileExists = true;
+                        ofd.Filter = "Soul Network (.network)|*.network|" +
+                                     "NeuroML(.xml)|*.xml";
+
+                        if (ofd.ShowDialog() == true)
+                        {
+                            currentworkshop.LoadNetwork(currentworkshop.Simulator.Recorder.Open(ofd.FileName));
+                        }
+                    }
+                }
+            }
+        }
+
+        private void Save_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (MainTab != null)
+            {
+                var currenttabcontent = MainTab.SelectedContent;
+                if (currenttabcontent != null)
+                {
+                    if (currenttabcontent.GetType() == typeof (WorkShop))
+                    {
+                        var currentworkshop = currenttabcontent as WorkShop;
+                        var sfd = new SaveFileDialog();
+                        sfd.AddExtension = true;
+                        sfd.DefaultExt = "network";
+                        sfd.Title = "Saving Neural Network ...";
+                        sfd.InitialDirectory = Environment.CurrentDirectory;
+                        sfd.FileName = "Soul";
+                        sfd.OverwritePrompt = true;
+                        sfd.CheckPathExists = true;
+                        sfd.Filter = "Soul Network (.network)|*.network|" +
+                                     "NeuroML(.xml)|*.xml";
+
+                        if (sfd.ShowDialog() == true)
+                        {
+                            currentworkshop.Simulator.Recorder.Save(currentworkshop.Simulator.Network, sfd.FileName);
+                        }
+                    }
+                }
+            }
+        }
 
         private void About_Click(object sender, RoutedEventArgs e)
         {
@@ -62,14 +121,41 @@ namespace Soul
                         if (!currentworkshop.IsRunning)
                         {
                             currentworkshop.Run();
+                            RunPause.Content = Resources["pauseico"];
+                            RunPause.ToolTip = "Pause Simulation";
                         }
                         else if (currentworkshop.IsPaused)
                         {
                             currentworkshop.Resume();
+                            RunPause.Content = Resources["pauseico"];
+                            RunPause.ToolTip = "Pause Simulation";
                         }
                         else
                         {
                             currentworkshop.Pause();
+                            RunPause.Content = Resources["playico"];
+                            RunPause.ToolTip = "Resume Simulation";
+                        }
+                    }
+                }
+            }
+        }
+
+        private void Run_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (MainTab != null)
+            {
+                var currenttabcontent = MainTab.SelectedContent;
+                if (currenttabcontent != null)
+                {
+                    if (currenttabcontent.GetType() == typeof(WorkShop))
+                    {
+                        var currentworkshop = currenttabcontent as WorkShop;
+                        e.CanExecute = true;
+                        if (!currentworkshop.IsRunning)
+                        {
+                            RunPause.Content = Resources["playico"];
+                            RunPause.ToolTip = "Run Simulation";
                         }
                     }
                 }
@@ -90,16 +176,6 @@ namespace Soul
                     }
                 }
             }
-        }
-
-        private void Open_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-
-        }
-
-        private void Save_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-
         }
 
         private void Step_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -172,7 +248,6 @@ namespace Soul
 
         private void Help_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-
         }
 
     }

@@ -14,10 +14,16 @@ module SSolver.CoreFunc
 
 open System
 
-let Gauss x l d =
-    Math.Exp(-(Math.Pow(x - 0.5 * l, 2.0)) / (2.0 * Math.Pow(d, 2.0)))
-    
-let Guass_Noise x u d =
+/// <summary>
+/// Gaussian Function
+/// </summary>
+let Gauss x u d =
+    Math.Exp( -( Math.Pow(x - u, 2.0) ) / ( 2.0 * Math.Pow(d, 2.0) ) )
+
+/// <summary>
+/// General Gaussian Random Number
+/// </summary>
+let gGuassRandom x u d =
     u+Math.Sqrt(d)*x
 
 /// <summary>

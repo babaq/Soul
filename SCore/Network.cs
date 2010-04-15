@@ -218,11 +218,37 @@ namespace SCore
                 s.AppendLine("# Network Summary.");
                 s.AppendLine("# ID=" + id.ToString("N"));
                 s.AppendLine("# Name=" + name);
-                s.AppendLine("# Position=" + position);
                 s.AppendLine("# NumberOfNeuron=" + neurons.Count);
+                if (neurons.Count > 0)
+                {
+                    s.AppendLine("# ----------------------------------------");
+                    for (int i = 0; i < neurons.Count; i++)
+                    {
+                        var n = neurons.ElementAt(i).Value;
+                        s.AppendLine("# Index=" + i);
+                        s.Append(n.Summary);
+                        s.AppendLine("# ----------------------------------------");
+                    }
+                }
                 s.AppendLine("# NumberOfChildNetwork=" + childnetworks.Count);
+                if (childnetworks.Count > 0)
+                {
+                    s.AppendLine("# ****************************************");
+                    for (int i = 0; i < childnetworks.Count; i++)
+                    {
+                        var n = childnetworks.ElementAt(i).Value;
+                        s.AppendLine("# Index=" + i);
+                        s.Append(n.Summary);
+                        s.AppendLine("# ****************************************");
+                    }
+                }
                 return s.ToString();
             }
+        }
+
+        public INetwork CreateInstance()
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

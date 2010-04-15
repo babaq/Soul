@@ -297,6 +297,18 @@ namespace SCore
             }
         }
 
+        public string Summary
+        {
+            get 
+            {
+                var s = new StringBuilder();
+                s.AppendLine("# Neuron Summary.");
+                s.AppendLine("# ID=" + id.ToString("N"));
+                s.AppendLine("# Name=" + name);
+                return s.ToString();
+            }
+        }
+
         #endregion
 
 

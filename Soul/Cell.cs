@@ -24,45 +24,43 @@ using SCore;
 
 namespace Soul
 {
-    public class Cell:ICell
+    public class Cell : ICell
     {
         private INeuron neuron;
         private ModelVisual3D mophology;
         public bool IsPushing { get; set; }
+        public Point3D Position
+        {
+            get { return neuron.Position; }
+            set
+            {
+                neuron.Position = value;
+                Translate.OffsetX = value.X;
+                Translate.OffsetY = value.Y;
+                Translate.OffsetZ = value.Z;
+            }
+        }
+        public RotateTransform3D Rotate { get; set; }
+        public TranslateTransform3D Translate { get; set; }
+        public ScaleTransform3D Scale { get; set; }
 
 
         public Cell(INeuron neuron, ModelVisual3D mophology)
         {
             this.neuron = neuron;
             this.mophology = mophology;
-
             neuron.Updated += OnUpdated;
             neuron.Hillock.Spike += OnSpike;
             IsPushing = true;
 
-
-
-            //var ty = Mophology;
-            //var t = ty.Content as Model3DGroup;
-            //var m = t.Children[0] as GeometryModel3D;
-            //var mm = m.Material as MaterialGroup;
-            //var mmm = mm.Children[0] as DiffuseMaterial;
-            ////mmm.Brush = new SolidColorBrush((Color)Imager.Convert(neuron.Output, null, Imaging.DefaultImaging(neuron.Type), null));
-            //var vv = mmm.Brush as SolidColorBrush;
-            //var b = new Binding();
-            //b.Source = neuron;
-            //b.Path = new PropertyPath("Output");
-            //b.Converter = Imager;
-            //b.ConverterParameter = Imaging.ImagingDye(neuron.Type);
-            //BindingOperations.SetBinding(vv, SolidColorBrush.ColorProperty, b);
-            
-            //vv.Color = (Color)Imager.Convert(neuron.Output, null, Imaging.DefaultImaging(neuron.Type), null);
-        }
-
-        ~Cell()
-        {
-            neuron.Updated -= OnUpdated;
-            neuron.Hillock.Spike -= OnSpike;
+            var transforms = new Transform3DGroup();
+            Rotate = new RotateTransform3D(new QuaternionRotation3D());
+            Translate = new TranslateTransform3D(neuron.Position.X, neuron.Position.Y, neuron.Position.Z);
+            Scale = new ScaleTransform3D();
+            transforms.Children.Add(Rotate);
+            transforms.Children.Add(Translate);
+            transforms.Children.Add(Scale);
+            Mophology.Transform = transforms;
         }
 
 
@@ -70,14 +68,14 @@ namespace Soul
 
         public INeuron Neuron
         {
-            get{return neuron;}
-            set{neuron = value;}
+            get { return neuron; }
+            set { neuron = value; }
         }
 
         public ModelVisual3D Mophology
         {
-            get{return mophology;}
-            set{mophology = value;}
+            get { return mophology; }
+            set { mophology = value; }
         }
 
         void OnUpdated(object sender, EventArgs e)
@@ -90,27 +88,6 @@ namespace Soul
                     neuron.NotifyPropertyChanged("Output");
                 }
             }
-            //if (!this.mophology.Dispatcher.CheckAccess())
-            //{
-            //    mophology.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate
-            //    {
-            //        n.NotifyPropertyChanged("Output");
-            //        //var ty = Mophology;
-            //        //var t = ty.Content as Model3DGroup;
-            //        //var m = t.Children[0] as GeometryModel3D;
-            //        //var mm = m.Material as MaterialGroup;
-            //        //var mmm = mm.Children[0] as DiffuseMaterial;
-            //        //mmm.Brush = new SolidColorBrush((Color)Imager.Convert(n.Output, null, Imaging.DefaultImaging(n.Type), null));
-            //        //var vv = mmm.Brush as SolidColorBrush;
-            //        //color = new SolidColorBrush((Color)Imager.Convert(n.Output, null, Imaging.DefaultImaging(n.Type), null));
-
-
-            //    });
-            //}
-            //else
-            //{
-
-            //}
         }
 
         void OnSpike(object sender, EventArgs e)

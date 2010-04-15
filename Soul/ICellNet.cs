@@ -19,8 +19,12 @@ using SCore;
 
 namespace Soul
 {
-    public interface ICellNetwork
+    public interface ICellNet
     {
+        INetwork Network { get; set; }
         ModelVisual3D Mophology { get; set; }
+        Dictionary<Guid, ICell> Cells { get; }
+        Dictionary<Guid, ICellNet> ChildCellNet { get; }
+        bool IsPushing { get; set; }
     }
 }

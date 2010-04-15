@@ -29,6 +29,15 @@ namespace Soul
             Color color;
             switch (type)
             {
+                case NeuronType.HH:
+                    color = Colors.Blue;
+                    break;
+                case NeuronType.IF:
+                    color = Colors.Red;
+                    break;
+                case NeuronType.LI:
+                    color = Colors.Green;
+                    break;
                 default:
                     color = Colors.White;
                     break;

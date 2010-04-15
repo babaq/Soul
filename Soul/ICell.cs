@@ -23,5 +23,10 @@ namespace Soul
     {
         INeuron Neuron { get; set; }
         ModelVisual3D Mophology { get; set; }
+        bool IsPushing { get; set; }
+        Point3D Position { get; set; }
+        RotateTransform3D Rotate { get; set; }
+        TranslateTransform3D Translate { get; set; }
+        ScaleTransform3D Scale { get; set; }
     }
 }
