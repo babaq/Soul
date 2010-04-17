@@ -23,12 +23,14 @@ namespace SCore
     {
         private double threshold;
         private INeuron hostneuron;
+        protected HillockType type;
 
 
         public ThresholdHeaviside(INeuron hostneuron, double threshold)
         {
             this.threshold = threshold;
             this.hostneuron = hostneuron;
+            type = HillockType.Heaviside;
         }
 
 
@@ -73,7 +75,7 @@ namespace SCore
             get { return null; }
         }
 
-        public virtual void UpdateTravelingSpikeTrain(double currentT)
+        public virtual void Tick(double currentT)
         {
         }
 
@@ -83,6 +85,11 @@ namespace SCore
             {
                 Spike(HostNeuron, EventArgs.Empty);
             }
+        }
+
+        public HillockType Type
+        {
+            get { return type; }
         }
 
         public event EventHandler Spike;

@@ -28,5 +28,6 @@ namespace Soul
         RotateTransform3D Rotate { get; set; }
         TranslateTransform3D Translate { get; set; }
         ScaleTransform3D Scale { get; set; }
+        Imaging Imager { get; set; }
     }
 }

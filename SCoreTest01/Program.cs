@@ -135,19 +135,19 @@ namespace SCoreTest01
                     var ind = i + j;
                     if (ind >= 0 && ind < N && i != ind)
                     {
-                        Es[i].ProjectedFrom(Es[ind], new SpikeWeightSynapse(Es[ind], 1000 * CoreFunc.Gauss((j + 1), 3, 3), 1));
+                        Es[i].ProjectedFrom(Es[ind], new SpikeWeightSynapse(Es[ind], 1000 * CoreFunc.Gauss((j + 1), 3, 3), 2));
                     }
 
                 }
 
-                Es[i].ProjectedFrom(I, new SpikeWeightSynapse(I, -5, 1));
-                Es[i].ProjectTo(I, new SpikeWeightSynapse(Es[i], 2000, 1));
+                Es[i].ProjectedFrom(I, new SpikeWeightSynapse(I, -5, 2));
+                Es[i].ProjectTo(I, new SpikeWeightSynapse(Es[i], 2000, 2));
                 //Es_Input.ProjectTo(I, new WeightSynapse(I, -0.2,0.1));
             }
             for (int i = 3; i < 7; i++)
             {
 
-                Es[i].ProjectedFrom(Es_Input, new SpikeWeightSynapse(Es_Input, 1000 * CoreFunc.Gauss((i - 4.5),0, 3),0.5));
+                Es[i].ProjectedFrom(Es_Input, new SpikeWeightSynapse(Es_Input, 1000 * CoreFunc.Gauss((i - 4.5),0, 3), 0.5));
             }
 
             //for (int i = 5; i < 15; i++)

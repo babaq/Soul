@@ -29,7 +29,7 @@ namespace SCore
         Dictionary<Guid,INetwork> ChildNetworks { get; }
         INetwork ParentNetwork { get; set; }
         void Update(double deltaT,double currentT,ISolver solver);
-        void Tick();
+        void Tick(double currentT);
         void RegisterUpdated(EventHandler onoutput);
         void RegisterSpike(EventHandler onspike);
         void UnRegisterUpdated(EventHandler onoutput);

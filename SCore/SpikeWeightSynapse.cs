@@ -51,7 +51,6 @@ namespace SCore
                         currentT - PreSynapticNeuron.Hillock.TravelingSpikeTrain.ElementAt(i) -
                         axondelay, deltaT);
                 }
-                PreSynapticNeuron.Hillock.UpdateTravelingSpikeTrain(currentT);
             }
             return dirac*Weight;
         }

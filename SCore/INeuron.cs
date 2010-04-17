@@ -32,7 +32,7 @@ namespace SCore
         double Output { get; set; }
         double LastOutput { get; set; }
         void Update(double deltaT,double currentT,ISolver solver);
-        void Tick();
+        void Tick(double currentT);
         void ProjectTo(INeuron targetneuron,ISynapse targetsynapse);
         void ProjectedFrom(INeuron sourceneuron,ISynapse selfsynapse);
         void DisConnect(Guid selfsynapseid);

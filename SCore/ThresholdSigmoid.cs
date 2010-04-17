@@ -24,6 +24,7 @@ namespace SCore
         public ThresholdSigmoid(INeuron hostneuron, double threshold)
             : base(hostneuron, threshold)
         {
+            type = HillockType.Sigmoid;
         }
 
 

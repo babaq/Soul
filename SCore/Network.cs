@@ -17,6 +17,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
 using SSolver;
+using System.Threading.Tasks;
 
 namespace SCore
 {
@@ -126,28 +127,44 @@ namespace SCore
             }
         }
 
-        public void Update(double deltaT,double currentT,ISolver solver)
+        public void Update(double deltaT, double currentT, ISolver solver)
         {
-            for (int i = 0; i < neurons.Count; i++)
+            Parallel.For(0, neurons.Count, (i) =>
             {
                 neurons.ElementAt(i).Value.Update(deltaT, currentT, solver);
-            }
-            for(int i=0;i<childnetworks.Count;i++)
+            });
+            Parallel.For(0, childnetworks.Count, (i) =>
             {
-                childnetworks.ElementAt(i).Value.Update(deltaT,currentT, solver);
-            }
+                childnetworks.ElementAt(i).Value.Update(deltaT, currentT, solver);
+            });
+            //for (int i = 0; i < neurons.Count; i++)
+            //{
+            //    neurons.ElementAt(i).Value.Update(deltaT, currentT, solver);
+            //}
+            //for (int i = 0; i < childnetworks.Count; i++)
+            //{
+            //    childnetworks.ElementAt(i).Value.Update(deltaT, currentT, solver);
+            //}
         }
 
-        public void Tick()
+        public void Tick(double currentT)
         {
-            for (int i = 0; i < neurons.Count; i++)
+            Parallel.For(0, neurons.Count, (i) =>
             {
-                neurons.ElementAt(i).Value.Tick();
-            }
-            for (int i = 0; i < childnetworks.Count; i++)
+                neurons.ElementAt(i).Value.Tick(currentT);
+            });
+            Parallel.For(0, childnetworks.Count, (i) =>
             {
-                childnetworks.ElementAt(i).Value.Tick();
-            }
+                childnetworks.ElementAt(i).Value.Tick(currentT);
+            });
+            //for (int i = 0; i < neurons.Count; i++)
+            //{
+            //    neurons.ElementAt(i).Value.Tick(currentT);
+            //}
+            //for (int i = 0; i < childnetworks.Count; i++)
+            //{
+            //    childnetworks.ElementAt(i).Value.Tick(currentT);
+            //}
         }
 
         public void RegisterUpdated(EventHandler onoutput)

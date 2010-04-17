@@ -24,6 +24,7 @@ namespace SCore
         private double resetpotential;
         private double refractoryperiod;
         private Queue<double> travelingspiketrain;
+        private bool isspiked;
 
 
         public ThresholdSpike(INeuron hostneuron, double threshold, double resetpotential, double refractoryperiod)
@@ -32,6 +33,8 @@ namespace SCore
             this.resetpotential = resetpotential;
             this.refractoryperiod = refractoryperiod;
             this.travelingspiketrain = new Queue<double>();
+            type = HillockType.Spike;
+            isspiked = false;
         }
 
 
@@ -43,7 +46,7 @@ namespace SCore
             }
             else
             {
-                travelingspiketrain.Enqueue(currentT);
+                isspiked = true;
                 FireSpike();
                 return resetpotential;
             }
@@ -79,11 +82,20 @@ namespace SCore
             return true;
         }
 
-        public override void UpdateTravelingSpikeTrain(double currentT)
+        public override void Tick(double currentT)
         {
-            if(currentT-travelingspiketrain.Peek()>GlobleSettings.AxonDelayMax)
+            if (isspiked)
             {
-                travelingspiketrain.Dequeue();
+                travelingspiketrain.Enqueue(currentT);
+                isspiked = false;
+            }
+
+            if (travelingspiketrain.Count > 0)
+            {
+                if (currentT - travelingspiketrain.Peek() > GlobleSettings.AxonDelayMax)
+                {
+                    travelingspiketrain.Dequeue();
+                }
             }
         }
 

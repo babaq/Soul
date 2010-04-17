@@ -43,12 +43,19 @@ namespace Soul
         public RotateTransform3D Rotate { get; set; }
         public TranslateTransform3D Translate { get; set; }
         public ScaleTransform3D Scale { get; set; }
+        private Imaging imager;
 
 
-        public Cell(INeuron neuron, ModelVisual3D mophology)
+        public Cell(INeuron neuron, Tuple<ModelVisual3D,Imaging> mophology_imager)
+            : this(neuron, mophology_imager.Item1, mophology_imager.Item2)
+        {
+        }
+
+        public Cell(INeuron neuron, ModelVisual3D mophology, Imaging imager)
         {
             this.neuron = neuron;
             this.mophology = mophology;
+            this.imager = imager;
             neuron.Updated += OnUpdated;
             neuron.Hillock.Spike += OnSpike;
             IsPushing = true;
@@ -92,6 +99,12 @@ namespace Soul
 
         void OnSpike(object sender, EventArgs e)
         {
+        }
+
+        public Imaging Imager
+        {
+            get { return imager; }
+            set { imager = value; }
         }
 
         #endregion

@@ -29,6 +29,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using SCore;
 using SSolver;
+using System.Windows.Media.Animation;
 
 namespace Soul
 {
@@ -110,28 +111,39 @@ namespace Soul
 
         void init()
         {
-            //var mp0 = new MP(0.3, 1.0) { ParentNetwork = simulator.Network };
-            //var mp1 = new MP(0.5, 0.0);
-            //mp0.ProjectTo(mp1, new WeightSynapse(mp0, 0.6));
-            //mp0.ProjectedFrom(mp1, new WeightSynapse(mp1, 0.8));
-            //mp0.ProjectTo(mp0, new WeightSynapse(mp0, 0.2));
-            //mp1.ProjectTo(mp1, new WeightSynapse(mp1, 0.4));
 
-            var li0 = new LI(-50, -54, 5, 2, -60) { ParentNetwork = simulator.Network };
-            var li1 = new LI(-50, -55, 5, 2, -60);
-            li0.ProjectTo(li1, new WeightSynapse(li0, 0.8));
-            li0.ProjectedFrom(li1, new WeightSynapse(li1, 0.6));
-            li0.ProjectTo(li0, new WeightSynapse(li0, 0.3));
-            li1.ProjectTo(li1, new WeightSynapse(li1, 0.5));
+            var li0 = new LI(-54, -55, 5, 2, -60) { ParentNetwork = simulator.Network };
+            var li1 = new LI(-54, -55, 5, 5, -60);
+            li0.ProjectTo(li1, new WeightSynapse(li0,30.8));
+            li0.ProjectedFrom(li1, new WeightSynapse(li1, 30.6));
+            li0.ProjectTo(li0, new WeightSynapse(li0, -0.3));
+            li1.ProjectTo(li1, new WeightSynapse(li1, -0.5));
 
-            //var cell0 = StemCell.Develop(mp0);
-            //var cell1 = StemCell.Develop(mp1);
             var cell0 = StemCell.Develop(li0);
             var cell1 = StemCell.Develop(li1);
-            cell1.Mophology.Transform = new TranslateTransform3D(2, 0, 0);
+            var r0 = new TranslateTransform3D(2, 0, 0);
+            //cell1.Mophology.Transform = r0;
 
             ModelVisual.Children.Add(cell0.Mophology);
             ModelVisual.Children.Add(cell1.Mophology);
+
+            var da = new DoubleAnimation();
+            da.From = 0;
+            da.To = 360;
+            //var ra = new Rotation3DAnimation(new AxisAngleRotation3D(new Vector3D(0, 1, 0), 360), TimeSpan.FromSeconds(5));
+            //ra.AutoReverse =true;
+            da.RepeatBehavior = RepeatBehavior.Forever;
+            da.Duration = TimeSpan.FromSeconds(5);
+            var r = new AxisAngleRotation3D();
+            r.Axis = new Vector3D(0, 1, 0);
+            var tg = new Transform3DGroup();
+            tg.Children.Add(r0);
+            tg.Children.Add(new RotateTransform3D(r));
+            cell1.Mophology.Transform = tg;
+            r.BeginAnimation(AxisAngleRotation3D.AngleProperty, da);
+
+            GlobleSettings.NeuronPotentialMin = -70.0;
+            GlobleSettings.NeuronPotentialMax = -10.0;
         }
 
         public void LoadNetwork(INetwork network)
@@ -327,7 +339,6 @@ namespace Soul
         {
             var isp = IsReportProgress;
             var isi = IsImaging;
-            StopPushing();
             simulator.Stop();
             IsReportProgress = isp;
             IsImaging = isi;
@@ -350,13 +361,6 @@ namespace Soul
             simulator.Step(Convert.ToDouble(DeltaTBox.Text));
             CurrentTBox.Text = simulator.CurrentT.ToString("F2");
             IsReportProgress = isp;
-        }
-
-        public void StopPushing()
-        {
-            IsReportProgress = false;
-            IsImaging = false;
-            Thread.Sleep(200);
         }
 
         #endregion

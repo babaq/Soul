@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SSolver;
+using System.Windows.Media.Media3D;
 
 namespace SCore
 {
@@ -91,6 +92,37 @@ namespace SCore
         public static void From_To(INetwork sourcenetwork, INetwork targetnetwork)
         {
             
+        }
+
+    }
+
+    public static class Proliferation
+    {
+        public static INetwork Division(Point3D dimension,Point3D dimensionscale, NeuronType neurontype)
+        {
+            var network = new Network();
+            for (var i = 0; i < dimension.X; i++)
+            {
+                for (var j = 0; j < dimension.Y; j++)
+                {
+                    for (var k = 0; k < dimension.Z; k++)
+                    {
+                        var x = i*dimensionscale.X;
+                        var y = j*dimensionscale.Y;
+                        var z = k*dimensionscale.Z;
+                        switch (neurontype)
+                        {
+                            case NeuronType.MP:
+                                new MP(0.5, 1.0) { ParentNetwork = network, Position = new Point3D(x,y,z) };
+                                break;
+                            case NeuronType.LI:
+                                new LI(-50, -60, 5, 2, -60) { ParentNetwork = network,Position = new Point3D(x,y,z)};
+                                break;
+                        }
+                    }
+                }
+            }
+            return network;
         }
 
     }

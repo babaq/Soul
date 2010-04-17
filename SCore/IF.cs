@@ -54,7 +54,8 @@ namespace SCore
                 }
                 var dynamicruleparam = new double[] {Tao, R, RestPotential, sigma};
                 Potential = solver.Solve(deltaT, currentT, Potential, dynamicruleparam, DynamicRule);
-                Output = Hillock.Fire(Potential, currentT);
+                Potential = Hillock.Fire(Potential, currentT);
+                Output = Potential;
             }
             RaiseUpdated();
         }

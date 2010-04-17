@@ -21,10 +21,13 @@ using SCore;
 
 namespace Soul
 {
-    [ValueConversion(typeof(double), typeof(Color), ParameterType = typeof(Color))]
-    public class Imaging:IValueConverter
+    [ValueConversion(typeof(double), typeof(Color), ParameterType = typeof(HillockType))]
+    public class Imaging : IValueConverter
     {
-        public static Color ImagingDye(NeuronType type)
+        public Color Dye { get; set; }
+
+
+        public static Color Dyes(NeuronType type)
         {
             Color color;
             switch (type)
@@ -45,15 +48,28 @@ namespace Soul
             return color;
         }
 
+        public static double Normalize(double source, HillockType type)
+        {
+            switch (type)
+            {
+                case HillockType.Spike:
+                    source = (source - GlobleSettings.NeuronPotentialMin) / GlobleSettings.NeuronPotentialRange;
+                    break;
+            }
+            return source;
+        }
+
 
         #region IValueConverter Members
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var neuronoutput = (double) value;
-            var imagingdye = (Color) parameter;
-            var imagingcolor = Color.FromRgb( (byte) (imagingdye.R*neuronoutput),
-                                  (byte) (imagingdye.G*neuronoutput), (byte) (imagingdye.B*neuronoutput));
+            var neuronoutput = (double)value;
+            var hillocktype = (HillockType)parameter;
+
+            neuronoutput = Normalize(neuronoutput, hillocktype);
+            var imagingcolor = Color.FromRgb((byte)(Dye.R * neuronoutput),
+                                  (byte)(Dye.G * neuronoutput), (byte)(Dye.B * neuronoutput));
             return imagingcolor;
         }
 

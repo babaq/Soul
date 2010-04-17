@@ -142,6 +142,7 @@ namespace SCore
             try
             {
                 recorder.RecordBegin();
+                hstop.Reset();
                 t0 = currentT;
                 do
                 {
@@ -170,8 +171,6 @@ namespace SCore
             {
                 hstop.Set();
                 Resume();
-                runthread.Join();
-                hstop.Reset();
             }
         }
 
@@ -197,7 +196,7 @@ namespace SCore
         {
             currentT += deltatime;
             network.Update(deltatime,currentT, solver);
-            network.Tick();
+            network.Tick(currentT);
             RaiseSteped();
         }
 

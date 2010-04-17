@@ -22,9 +22,9 @@ using SCore;
 
 namespace Soul
 {
-    public class StemCell: IStemCell
+    public class StemCell : IStemCell
     {
-        public static Imaging Imager =new Imaging();
+        public static Imaging Imager = new Imaging();
 
 
         #region IStemCell Members
@@ -44,7 +44,7 @@ namespace Soul
 
         public ICell Develop(INeuron neuron)
         {
-            if(neuron==null)
+            if (neuron == null)
             {
                 return null;
             }
@@ -55,7 +55,7 @@ namespace Soul
 
         public ICellNet Develop(INetwork network)
         {
-            if(network==null)
+            if (network == null)
             {
                 return null;
             }
@@ -64,39 +64,44 @@ namespace Soul
             for (int i = 0; i < cellnet.Network.Neurons.Count; i++)
             {
                 var cell = Develop(cellnet.Network.Neurons.ElementAt(i).Value);
-                cellnet.Cells.Add(cell.Neuron.ID,cell);
+                cellnet.Cells.Add(cell.Neuron.ID, cell);
                 cellnet.Mophology.Children.Add(cell.Mophology);
             }
-            for (int i = 0; i <cellnet.Network.ChildNetworks.Count; i++)
+            for (int i = 0; i < cellnet.Network.ChildNetworks.Count; i++)
             {
                 var childcellnet = Develop(cellnet.Network.ChildNetworks.ElementAt(i).Value);
-                cellnet.ChildCellNet.Add(childcellnet.Network.ID,childcellnet);
+                cellnet.ChildCellNet.Add(childcellnet.Network.ID, childcellnet);
                 cellnet.Mophology.Children.Add(childcellnet.Mophology);
             }
             return cellnet;
         }
 
-        public ModelVisual3D DevelopMophology(INeuron neuron)
+        public Tuple<ModelVisual3D, Imaging> DevelopMophology(INeuron neuron)
         {
             var mophology = new Model3DGroup();
-            DevelopSomaMophology(neuron,mophology);
-            DevelopDendriteMophology(neuron,mophology);
-            return new ModelVisual3D {Content = mophology};
+            var imager = Imager;
+            DevelopSomaMophology(neuron, mophology, imager);
+            DevelopDendriteMophology(neuron, mophology, imager);
+            DevelopAxonMophology(neuron, mophology, imager);
+            return new Tuple<ModelVisual3D, Imaging>(new ModelVisual3D { Content = mophology }, imager);
         }
 
-        void DevelopSomaMophology(INeuron neuron, Model3DGroup mophology)
+        void DevelopSomaMophology(INeuron neuron, Model3DGroup mophology, Imaging imager)
         {
-            mophology.Children.Add(new GeometryModel3D(DevelopSomaGeometry(neuron), DevelopSomaMaterial(neuron)));
+            mophology.Children.Add(new GeometryModel3D(DevelopSomaGeometry(neuron), DevelopSomaMaterial(neuron, imager)));
         }
 
-        void DevelopDendriteMophology(INeuron neuron, Model3DGroup mophology)
+        void DevelopDendriteMophology(INeuron neuron, Model3DGroup mophology, Imaging imager)
         {
-            
+        }
+
+        void DevelopAxonMophology(INeuron neuron, Model3DGroup mophology, Imaging imager)
+        {
         }
 
         MeshGeometry3D DevelopSomaGeometry(INeuron neuron)
         {
-            MeshGeometry3D mesh=null;
+            MeshGeometry3D mesh = null;
             switch (neuron.Type)
             {
                 case NeuronType.MP:
@@ -109,7 +114,7 @@ namespace Soul
             return mesh;
         }
 
-        MaterialGroup DevelopSomaMaterial(INeuron neuron)
+        MaterialGroup DevelopSomaMaterial(INeuron neuron, Imaging imager)
         {
             MaterialGroup mg = new MaterialGroup();
             switch (neuron.Type)
@@ -119,13 +124,14 @@ namespace Soul
                 case NeuronType.HH:
                 case NeuronType.MP:
                     var brush = new SolidColorBrush();
+                    imager.Dye = Imaging.Dyes(neuron.Type);
 
                     var binding = new Binding()
                                       {
                                           Source = neuron,
                                           Path = new PropertyPath("Output"),
-                                          Converter = Imager,
-                                          ConverterParameter = Imaging.ImagingDye(neuron.Type),
+                                          Converter = imager,
+                                          ConverterParameter = neuron.Hillock.Type,
                                           Mode = BindingMode.OneWay
                                       };
                     BindingOperations.SetBinding(brush, SolidColorBrush.ColorProperty, binding);

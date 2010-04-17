@@ -125,9 +125,10 @@ namespace SCore
             RaiseUpdated();
         }
 
-        public void Tick()
+        public void Tick(double currentT)
         {
             lastoutput = output;
+            hillock.Tick(currentT);
         }
 
         public void ProjectTo(INeuron targetneuron, ISynapse targetsynapse)

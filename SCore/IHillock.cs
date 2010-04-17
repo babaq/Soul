@@ -26,8 +26,16 @@ namespace SCore
         double RefractoryPeriod { set; get; }
         bool IsInRefractoryPeriod(double currentT);
         Queue<double > TravelingSpikeTrain{ get;}
-        void UpdateTravelingSpikeTrain(double currentT);
+        void Tick(double currentT);
         event EventHandler Spike;
         void FireSpike();
+        HillockType Type { get; }
+    }
+
+    public enum HillockType
+    {
+        Heaviside,
+        Sigmoid,
+        Spike
     }
 }

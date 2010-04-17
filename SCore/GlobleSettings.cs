@@ -20,6 +20,12 @@ namespace SCore
     public static class GlobleSettings
     {
         public static double AxonDelayMax = 20.0;
+        public static double NeuronPotentialMin = -100.0;
+        public static double NeuronPotentialMax = 50.0;
+        public static double NeuronPotentialRange
+        {
+            get { return NeuronPotentialMax - NeuronPotentialMin; }
+        }
     }
 
 }
