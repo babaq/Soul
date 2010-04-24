@@ -14,21 +14,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Windows.Media.Media3D;
-using SCore;
 
-namespace Soul
+namespace SCore
 {
-    public interface ICellNet
+    class CurrentSource
     {
-        INetwork Network { get; set; }
-        ModelVisual3D Mophology { get; set; }
-        Dictionary<Guid, ICell> Cells { get; }
-        Dictionary<Guid, ICellNet> ChildCellNet { get; }
-        bool IsPushing { get; set; }
-        Point3D Position { get; set; }
-        RotateTransform3D Rotate { get; set; }
-        TranslateTransform3D Translate { get; set; }
-        ScaleTransform3D Scale { get; set; }
     }
 }

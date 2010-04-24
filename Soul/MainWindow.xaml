@@ -13,6 +13,7 @@
         <CommandBinding Command="Soul:SCommands.Run" Executed="Run_Executed" CanExecute="Run_CanExecute"/>
         <CommandBinding Command="Soul:SCommands.Stop" Executed="Stop_Executed"/>
         <CommandBinding Command="Soul:SCommands.Step" Executed="Step_Executed" CanExecute="Step_CanExecute" />
+        <CommandBinding Command="Soul:SCommands.ReSet" Executed="ReSet_Executed" CanExecute="ReSet_CanExecute"/>
         <CommandBinding Command="Soul:SCommands.IsReportProgress" Executed="IsReportProgress_Executed"/>
         <CommandBinding Command="Soul:SCommands.IsImaging" Executed="IsImaging_Executed"/>
     </Window.CommandBindings>
@@ -29,6 +30,7 @@
         <Image x:Key="pauseico" Source="Icons\pause.ico"/>
         <Image x:Key="stopico" Source="Icons\stop.ico"/>
         <Image x:Key="stepico" Source="Icons\step.ico"/>
+        <Image x:Key="resetico" Source="Icons\reset.ico"/>
     </Window.Resources>
     
     <Grid>
@@ -88,6 +90,10 @@
 
                 </MenuItem>
                 <Separator/>
+                <MenuItem Header="ReSet" Command="Soul:SCommands.ReSet">
+
+                </MenuItem>
+                <Separator/>
                 <MenuItem Header="Report Progress" IsCheckable="True" IsChecked="True" Command="Soul:SCommands.IsReportProgress">
                     
                 </MenuItem>
@@ -128,6 +134,9 @@
             <Button x:Name="Stop" Command="Soul:SCommands.Stop" ToolTip="Stop Simulation" Content="{StaticResource stopico}">
             </Button>
             <Button x:Name="Step" Command="Soul:SCommands.Step" ToolTip="Step Simulation" Content="{StaticResource stepico}">
+            </Button>
+            <Separator/>
+            <Button x:Name="ReSet" Command="Soul:SCommands.ReSet" ToolTip="ReSet Simulation" Content="{StaticResource resetico}">
             </Button>
             <Separator/>
         </ToolBar>

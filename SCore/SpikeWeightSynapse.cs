@@ -24,11 +24,13 @@ namespace SCore
         private double axondelay;
 
 
-        public SpikeWeightSynapse(INeuron presynapticneuron, double weight) : this(presynapticneuron, weight,0.0)
+        public SpikeWeightSynapse(INeuron presynapticneuron, double weight)
+            : this(presynapticneuron, weight, 0.1)
         {
         }
 
-        public SpikeWeightSynapse(INeuron presynapticneuron, double weight, double axondelay) : base(presynapticneuron, weight)
+        public SpikeWeightSynapse(INeuron presynapticneuron, double weight, double axondelay)
+            : base(presynapticneuron, weight)
         {
             this.axondelay = axondelay;
         }
@@ -36,8 +38,8 @@ namespace SCore
 
         public override double AxonDelay
         {
-            get{return axondelay;}
-            set{axondelay = value;}
+            get { return axondelay; }
+            set { axondelay = value; }
         }
 
         public override double Release(double deltaT, double currentT)
@@ -52,7 +54,13 @@ namespace SCore
                         axondelay, deltaT);
                 }
             }
-            return dirac*Weight;
+            return dirac * Weight;
+        }
+
+        public override object Clone()
+        {
+            var clone = new SpikeWeightSynapse(PreSynapticNeuron, Weight, axondelay);
+            return clone;
         }
 
     }

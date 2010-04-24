@@ -30,13 +30,13 @@ namespace SCore
         {
         }
 
-        public IF(string name,double threshold, double resetpotential, double refractoryperiod, double initpotential, double r, double c, double restpotential)
-            : this(name, new Point3D(), new ThresholdSpike(null, threshold, resetpotential, refractoryperiod), initpotential, r, c, restpotential,0.0)
+        public IF(string name, double threshold, double resetpotential, double refractoryperiod, double initpotential, double r, double c, double restpotential)
+            : this(name, new Point3D(), new ThresholdSpike(null, threshold, resetpotential, refractoryperiod), initpotential, r, c, restpotential, 0.0)
         {
         }
 
-        public IF(string name, Point3D position, IHillock hillock, double initpotential, double r, double c, double restpotential, double currentT)
-            : base(name, position, hillock, initpotential, r, c, restpotential,currentT)
+        public IF(string name, Point3D position, IHillock hillock, double initpotential, double r, double c, double restpotential, double startT)
+            : base(name, position, hillock, initpotential, r, c, restpotential, startT)
         {
             DynamicRule = CoreFunc.dIF;
             type = NeuronType.IF;
@@ -47,15 +47,10 @@ namespace SCore
         {
             if (!Hillock.IsInRefractoryPeriod(currentT))
             {
-                var sigma = 0.0;
-                for (int i = 0; i < Synapses.Count; i++)
-                {
-                    sigma += Synapses.ElementAt(i).Value.Release(deltaT, currentT);
-                }
-                var dynamicruleparam = new double[] {Tao, R, RestPotential, sigma};
+                var input = SynapseCurrents(deltaT, currentT) + InjectedCurrents(currentT);
+                var dynamicruleparam = new double[] { Tao, R, RestPotential, input };
                 Potential = solver.Solve(deltaT, currentT, Potential, dynamicruleparam, DynamicRule);
-                Potential = Hillock.Fire(Potential, currentT);
-                Output = Potential;
+                Output = Potential = Hillock.Fire(Potential, currentT);
             }
             RaiseUpdated();
         }

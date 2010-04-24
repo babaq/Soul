@@ -18,13 +18,20 @@ using System.Windows.Media.Media3D;
 
 namespace SCore
 {
-    public interface ISynapse
+    public interface ISynapse : ICloneable
     {
         Guid ID { get; }
         double Weight { set; get; }
-        INeuron PreSynapticNeuron { get; }
-        Point3D Position { set; get; }
+        INeuron PreSynapticNeuron { get; set; }
         double AxonDelay { set; get; }
-        double Release(double deltaT,double currentT);
+        double Release(double deltaT, double currentT);
+        SynapseType Type { get; }
     }
+
+    public enum SynapseType
+    {
+        WeightSynapse,
+        SpikeWeightSynapse
+    }
+
 }

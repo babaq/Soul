@@ -17,25 +17,31 @@ using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
 using SSolver;
+using System.ComponentModel;
 
 namespace SCore
 {
-    public interface INetwork
+    public interface INetwork : INotifyPropertyChanged,IRandomizable
     {
         Guid ID { get; }
         string Name { get; set; }
         Point3D Position { set; get; }
+        INeuron[, ,] DimensionNeurons { get; }
         Dictionary<Guid, INeuron> Neurons { get; }
-        Dictionary<Guid,INetwork> ChildNetworks { get; }
+        Dictionary<Guid, INetwork> ChildNetworks { get; }
         INetwork ParentNetwork { get; set; }
-        void Update(double deltaT,double currentT,ISolver solver);
+        void Update(double deltaT, double currentT, ISolver solver);
         void Tick(double currentT);
         void RegisterUpdated(EventHandler onoutput);
         void RegisterSpike(EventHandler onspike);
         void UnRegisterUpdated(EventHandler onoutput);
         void UnRegisterSpike(EventHandler onspike);
         void RaiseUpdated();
-        string Summary{ get;}
-        INetwork CreateInstance();
+        string Summary { get; }
+        void Set(bool isincludechildnetwork = false, Point3D? position = null, double? potential = null, double? output = null, double? lastoutput = null, double? r = null, double? c = null, double? restpotential = null);
+        Nullable< Point3D> Dimension { get; }
+        void ReShape(Point3D newdimension,Vector3D? neurondistance=null,bool isincludechildnetwork=false);
+        void NotifyPropertyChanged(string propertyname);
+        void ReSet(double startT = 0.0, bool isincludechildnetwork = true);
     }
 }

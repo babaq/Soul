@@ -14,18 +14,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Media.Media3D;
 
 namespace SCore
 {
     public static class GlobleSettings
     {
-        public static double AxonDelayMax = 20.0;
+        public static double AxonDelayMax = 10.0;
         public static double NeuronPotentialMin = -100.0;
         public static double NeuronPotentialMax = 50.0;
         public static double NeuronPotentialRange
         {
             get { return NeuronPotentialMax - NeuronPotentialMin; }
         }
+        public static Vector3D NeuronDistance = new Vector3D(2.5, 2.5, 2.5);
     }
 
 }

@@ -210,6 +210,38 @@ namespace Soul
             }
         }
 
+        private void ReSet_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (MainTab != null)
+            {
+                var currenttabcontent = MainTab.SelectedContent;
+                if (currenttabcontent != null)
+                {
+                    if (currenttabcontent.GetType() == typeof(WorkShop))
+                    {
+                        var currentworkshop = currenttabcontent as WorkShop;
+                        currentworkshop.ReSet();
+                    }
+                }
+            }
+        }
+
+        private void ReSet_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (MainTab != null)
+            {
+                var currenttabcontent = MainTab.SelectedContent;
+                if (currenttabcontent != null)
+                {
+                    if (currenttabcontent.GetType() == typeof(WorkShop))
+                    {
+                        var currentworkshop = currenttabcontent as WorkShop;
+                        e.CanExecute = !currentworkshop.IsRunning;
+                    }
+                }
+            }
+        }
+
         private void IsReportProgress_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             if (MainTab != null)

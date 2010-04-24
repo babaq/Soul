@@ -21,10 +21,10 @@ let Gauss x u d =
     Math.Exp( -( Math.Pow(x - u, 2.0) ) / ( 2.0 * Math.Pow(d, 2.0) ) )
 
 /// <summary>
-/// General Gaussian Random Number
+/// General Random Number(mean, std)
 /// </summary>
-let gGuassRandom x u d =
-    u+Math.Sqrt(d)*x
+let RNMeanStd (sample:float) mean std =
+    mean+std*sample
 
 /// <summary>
 /// Heaviside Unit Step Function

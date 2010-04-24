@@ -30,8 +30,10 @@ namespace SCore
         private Guid id;
         private string name;
         private Point3D position;
-        private Dictionary<Guid,ISynapse> weightsynapses;
+        private Dictionary<Guid, ISynapse> synapses;
+        private Dictionary<Guid, ICurrentSource> currentsources;
         private IHillock hillock;
+        private double initpotential;
         private double potential;
         private double output;
         private double lastoutput;
@@ -45,22 +47,23 @@ namespace SCore
         {
         }
 
-        public MP(string name,double threshold, double initpotential)
-            : this(name, new Point3D(), new ThresholdHeaviside(null, threshold), initpotential,0.0)
+        public MP(string name, double threshold, double initpotential)
+            : this(name, new Point3D(), new ThresholdHeaviside(null, threshold), initpotential, 0.0)
         {
         }
 
-        public MP(string name,Point3D position, IHillock hillock,double initpotential,double currentT)
+        public MP(string name, Point3D position, IHillock hillock, double initpotential, double startT)
         {
             id = Guid.NewGuid();
             this.name = name;
             this.position = position;
-            weightsynapses = new Dictionary<Guid,ISynapse>();
+            synapses = new Dictionary<Guid, ISynapse>();
+            currentsources = new Dictionary<Guid, ICurrentSource>();
             this.hillock = hillock;
             this.hillock.HostNeuron = this;
-            potential = initpotential;
-            output = lastoutput = this.hillock.Fire(initpotential, currentT);
-            parentnetwork =null;
+            this.initpotential = initpotential;
+            ReSet(startT);
+            parentnetwork = null;
             dynamicrule = null;
             type = NeuronType.MP;
         }
@@ -82,18 +85,28 @@ namespace SCore
         public Point3D Position
         {
             get { return position; }
-            set { position = value; }
+            set
+            {
+                position = value;
+                NotifyPropertyChanged("Position");
+            }
         }
 
-        public Dictionary<Guid,ISynapse> Synapses
+        public Dictionary<Guid, ISynapse> Synapses
         {
-            get { return weightsynapses; }
+            get { return synapses; }
         }
 
         public IHillock Hillock
         {
             get { return hillock; }
             set { hillock = value; }
+        }
+
+        public double InitPotential
+        {
+            get { return initpotential; }
+            set { initpotential = value; }
         }
 
         public double Potential
@@ -114,14 +127,9 @@ namespace SCore
             set { lastoutput = value; }
         }
 
-        public virtual void Update(double deltaT,double currentT,ISolver solver)
+        public virtual void Update(double deltaT, double currentT, ISolver solver)
         {
-            var sigma = 0.0;
-            for (int i = 0; i < weightsynapses.Count; i++)
-            {
-                sigma += weightsynapses.ElementAt(i).Value.Release(deltaT, currentT);
-            }
-            output = hillock.Fire(sigma,currentT);
+            output = hillock.Fire(SynapseCurrents(deltaT, currentT), currentT);
             RaiseUpdated();
         }
 
@@ -236,7 +244,7 @@ namespace SCore
 
         public void RaiseUpdated()
         {
-            if(Updated!=null)
+            if (Updated != null)
             {
                 Updated(this, EventArgs.Empty);
             }
@@ -251,12 +259,12 @@ namespace SCore
         public virtual double C
         {
             get { return 0.0; }
-            set {}
+            set { }
         }
 
         public double Tao
         {
-            get { return R*C; }
+            get { return R * C; }
         }
 
         public virtual double RestPotential
@@ -292,22 +300,95 @@ namespace SCore
 
         public void NotifyPropertyChanged(string propertyname)
         {
-            if(PropertyChanged!=null)
+            if (PropertyChanged != null)
             {
-                PropertyChanged(this,new PropertyChangedEventArgs(propertyname));
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyname));
             }
         }
 
         public string Summary
         {
-            get 
+            get
             {
                 var s = new StringBuilder();
                 s.AppendLine("# Neuron Summary.");
                 s.AppendLine("# ID=" + id.ToString("N"));
                 s.AppendLine("# Name=" + name);
+                s.AppendLine("# Position=" + position);
                 return s.ToString();
             }
+        }
+
+        public void Set(Point3D? position = null, double? potential = null, double? output = null, double? lastoutput = null, double? r = null, double? c = null, double? restpotential = null)
+        {
+            if (position.HasValue)
+            {
+                Position = position.Value;
+            }
+            if (potential.HasValue)
+            {
+                Potential = potential.Value;
+            }
+            if (output.HasValue)
+            {
+                Output = output.Value;
+            }
+            if (lastoutput.HasValue)
+            {
+                LastOutput = lastoutput.Value;
+            }
+            if (r.HasValue)
+            {
+                R = r.Value;
+            }
+            if (c.HasValue)
+            {
+                C = c.Value;
+            }
+            if (restpotential.HasValue)
+            {
+                RestPotential = restpotential.Value;
+            }
+        }
+
+        public void ReSet(double startT = 0.0)
+        {
+            potential = initpotential;
+            output = lastoutput = hillock.Fire(initpotential, startT);
+            RaiseUpdated();
+        }
+
+        public void InjectedFrom(ICurrentSource currentsource)
+        {
+            if (!this.CurrentSources.ContainsValue(currentsource))
+            {
+                this.CurrentSources.Add(currentsource.ID, currentsource);
+            }
+        }
+
+        public Dictionary<Guid, ICurrentSource> CurrentSources
+        {
+            get { return currentsources; }
+        }
+
+        public double InjectedCurrents(double currentT)
+        {
+            var current = 0.0;
+            for (int i = 0; i < currentsources.Count; i++)
+            {
+                current += currentsources.ElementAt(i).Value.Flow(currentT);
+            }
+            return current;
+        }
+
+        public double SynapseCurrents(double deltaT, double currentT)
+        {
+            var sigma = 0.0;
+            for (int i = 0; i < Synapses.Count; i++)
+            {
+                sigma += Synapses.ElementAt(i).Value.Release(deltaT, currentT);
+            }
+            return sigma;
         }
 
         #endregion

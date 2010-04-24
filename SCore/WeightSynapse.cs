@@ -24,6 +24,7 @@ namespace SCore
         private Guid id;
         private double weight;
         private INeuron presynapticneuron;
+        private SynapseType type;
 
 
         public WeightSynapse(INeuron presynapticneuron, double weight)
@@ -31,6 +32,7 @@ namespace SCore
             this.id = Guid.NewGuid();
             this.presynapticneuron = presynapticneuron;
             this.weight = weight;
+            type = SynapseType.WeightSynapse;
         }
 
 
@@ -50,12 +52,7 @@ namespace SCore
         public INeuron PreSynapticNeuron
         {
             get { return presynapticneuron; }
-        }
-
-        public Point3D Position
-        {
-            get { return new Point3D(); }
-            set { }
+            set { presynapticneuron = value; }
         }
 
         public virtual double AxonDelay
@@ -69,6 +66,18 @@ namespace SCore
             return presynapticneuron.LastOutput * weight;
         }
 
+        public SynapseType Type
+        {
+            get { return type; }
+        }
+
+        public virtual object Clone()
+        {
+            var clone = new WeightSynapse(presynapticneuron, weight);
+            return clone;
+        }
+
         #endregion
+
     }
 }

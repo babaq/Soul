@@ -29,13 +29,19 @@ namespace Soul
 
         #region IStemCell Members
 
-        public ICell Develop(NeuronType neurontype)
+        public ICell Develop(NeuronType neurontype, double threshold = -50, double initpotential = -60, double restpotential = -60, double r = 5, double c = 2, double resetpotential = -60, double refractoryperiod = 1)
         {
             INeuron neuron = null;
             switch (neurontype)
             {
-                default:
-                    neuron = new MP(0.5, 1.0);
+                case NeuronType.MP:
+                    neuron = new MP(threshold, initpotential);
+                    break;
+                case NeuronType.LI:
+                    neuron = new LI(threshold, initpotential, r, c, restpotential);
+                    break;
+                case NeuronType.IF:
+                    neuron = new IF(threshold, resetpotential, refractoryperiod, initpotential, r, c, restpotential);
                     break;
             }
 

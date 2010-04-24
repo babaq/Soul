@@ -24,29 +24,35 @@ using SCore;
 
 namespace Soul
 {
-    public class Cell : ICell
+    public class Cell : DependencyObject, ICell
     {
         private INeuron neuron;
         private ModelVisual3D mophology;
         public bool IsPushing { get; set; }
+        public static readonly DependencyProperty PositionProperty = DependencyProperty.Register("Position", typeof(Point3D), typeof(Cell), new PropertyMetadata(OnPositionChanged));
         public Point3D Position
         {
-            get { return neuron.Position; }
-            set
-            {
-                neuron.Position = value;
-                Translate.OffsetX = value.X;
-                Translate.OffsetY = value.Y;
-                Translate.OffsetZ = value.Z;
-            }
+            get { return (Point3D)GetValue(PositionProperty); }
+            set { neuron.Position = value; }
         }
         public RotateTransform3D Rotate { get; set; }
         public TranslateTransform3D Translate { get; set; }
         public ScaleTransform3D Scale { get; set; }
         private Imaging imager;
+        private static void OnPositionChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
+        {
+            Cell thiscell = obj as Cell;
+            if (thiscell.IsPushing)
+            {
+                var p = (Point3D)args.NewValue;
+                thiscell.Translate.OffsetX = p.X;
+                thiscell.Translate.OffsetY = p.Y;
+                thiscell.Translate.OffsetZ = p.Z;
+            }
+        }
 
 
-        public Cell(INeuron neuron, Tuple<ModelVisual3D,Imaging> mophology_imager)
+        public Cell(INeuron neuron, Tuple<ModelVisual3D, Imaging> mophology_imager)
             : this(neuron, mophology_imager.Item1, mophology_imager.Item2)
         {
         }
@@ -68,6 +74,14 @@ namespace Soul
             transforms.Children.Add(Translate);
             transforms.Children.Add(Scale);
             Mophology.Transform = transforms;
+
+            var binding = new Binding()
+            {
+                Source = neuron,
+                Path = new PropertyPath("Position"),
+                Mode = BindingMode.OneWay
+            };
+            BindingOperations.SetBinding(this, Cell.PositionProperty, binding);
         }
 
 

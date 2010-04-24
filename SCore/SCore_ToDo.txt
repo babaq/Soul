@@ -1,6 +1,5 @@
 ﻿helper.projection
-helper.proliferation
-helper.currentsource
-helper.li
-helper.if.possion
+currentsource
+inputneuron
 network.serilize
+standard model

@@ -35,13 +35,13 @@ namespace SCore
         {
         }
 
-        public LI(string name,double threshold, double initpotential, double r, double c, double restpotential)
-            : this(name, new Point3D(), new ThresholdSigmoid(null, threshold), initpotential, r, c, restpotential,0.0)
+        public LI(string name, double threshold, double initpotential, double r, double c, double restpotential)
+            : this(name, new Point3D(), new ThresholdSigmoid(null, threshold), initpotential, r, c, restpotential, 0.0)
         {
         }
 
-        public LI(string name, Point3D position, IHillock hillock, double initpotential, double r, double c, double restpotential,double currentT)
-            : base(name, position, hillock, initpotential,currentT)
+        public LI(string name, Point3D position, IHillock hillock, double initpotential, double r, double c, double restpotential, double startT)
+            : base(name, position, hillock, initpotential, startT)
         {
             this.r = r;
             this.c = c;
@@ -53,30 +53,26 @@ namespace SCore
 
         public override double R
         {
-            get{return r;}
-            set{r = value;}
+            get { return r; }
+            set { r = value; }
         }
 
         public override double C
         {
-            get{return c;}
-            set{c = value;}
+            get { return c; }
+            set { c = value; }
         }
 
         public override double RestPotential
         {
-            get{return restpotential;}
-            set{restpotential = value;}
+            get { return restpotential; }
+            set { restpotential = value; }
         }
 
-        public override void Update(double deltaT,double currentT,ISolver solver)
+        public override void Update(double deltaT, double currentT, ISolver solver)
         {
-            var sigma = 0.0;
-            for (int i = 0; i < Synapses.Count; i++)
-            {
-                sigma += Synapses.ElementAt(i).Value.Release(deltaT, currentT);
-            }
-            var dynamicruleparam = new double[] {Tao,RestPotential, sigma};
+            var input = SynapseCurrents(deltaT, currentT) + R * InjectedCurrents(currentT);
+            var dynamicruleparam = new double[] { Tao, RestPotential, input };
             Potential = solver.Solve(deltaT, currentT, Potential, dynamicruleparam, DynamicRule);
             Output = Hillock.Fire(Potential, currentT);
             RaiseUpdated();
@@ -84,7 +80,7 @@ namespace SCore
 
         public override object Clone()
         {
-            var clone = new LI(Hillock.Threshold, LastOutput, r,c,restpotential);
+            var clone = new LI(Hillock.Threshold, Potential, r, c, restpotential);
             return clone;
         }
 

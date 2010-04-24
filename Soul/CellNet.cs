@@ -16,16 +16,38 @@ using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
 using SCore;
+using System.Windows;
+using System.Windows.Data;
 
 namespace Soul
 {
-    public class CellNet : ICellNet
+    public class CellNet : DependencyObject, ICellNet
     {
         private INetwork network;
         private ModelVisual3D mophology;
         private Dictionary<Guid, ICell> cells;
         private Dictionary<Guid, ICellNet> childcellnet;
         private bool ispushing;
+        public static readonly DependencyProperty PositionProperty = DependencyProperty.Register("Position", typeof(Point3D), typeof(CellNet), new PropertyMetadata(OnPositionChanged));
+        public Point3D Position
+        {
+            get { return network.Position; }
+            set { network.Position = value; }
+        }
+        public RotateTransform3D Rotate { get; set; }
+        public TranslateTransform3D Translate { get; set; }
+        public ScaleTransform3D Scale { get; set; }
+        private static void OnPositionChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
+        {
+            CellNet thiscellnet = obj as CellNet;
+            if (thiscellnet.IsPushing)
+            {
+                var p = (Point3D)args.NewValue;
+                thiscellnet.Translate.OffsetX = p.X;
+                thiscellnet.Translate.OffsetY = p.Y;
+                thiscellnet.Translate.OffsetZ = p.Z;
+            }
+        }
 
 
         public CellNet(INetwork network)
@@ -40,6 +62,23 @@ namespace Soul
             this.cells = cells;
             this.childcellnet = childcellnet;
             IsPushing = true;
+
+            var transforms = new Transform3DGroup();
+            Rotate = new RotateTransform3D(new QuaternionRotation3D());
+            Translate = new TranslateTransform3D(network.Position.X, network.Position.Y, network.Position.Z);
+            Scale = new ScaleTransform3D();
+            transforms.Children.Add(Rotate);
+            transforms.Children.Add(Translate);
+            transforms.Children.Add(Scale);
+            Mophology.Transform = transforms;
+
+            var binding = new Binding()
+            {
+                Source = network,
+                Path = new PropertyPath("Position"),
+                Mode = BindingMode.OneWay
+            };
+            BindingOperations.SetBinding(this, CellNet.PositionProperty, binding);
         }
 
 

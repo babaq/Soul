@@ -26,15 +26,16 @@ namespace SCore
         Guid ID { get; }
         string Name { set; get; }
         Point3D Position { set; get; }
-        Dictionary<Guid,ISynapse> Synapses { get; }
+        Dictionary<Guid, ISynapse> Synapses { get; }
         IHillock Hillock { set; get; }
+        double InitPotential { get; set; }
         double Potential { get; set; }
         double Output { get; set; }
         double LastOutput { get; set; }
-        void Update(double deltaT,double currentT,ISolver solver);
+        void Update(double deltaT, double currentT, ISolver solver);
         void Tick(double currentT);
-        void ProjectTo(INeuron targetneuron,ISynapse targetsynapse);
-        void ProjectedFrom(INeuron sourceneuron,ISynapse selfsynapse);
+        void ProjectTo(INeuron targetneuron, ISynapse targetsynapse);
+        void ProjectedFrom(INeuron sourceneuron, ISynapse selfsynapse);
         void DisConnect(Guid selfsynapseid);
         INetwork ParentNetwork { get; set; }
         Derivative DynamicRule { get; set; }
@@ -51,6 +52,12 @@ namespace SCore
         NeuronType Type { get; }
         void NotifyPropertyChanged(string propertyname);
         string Summary { get; }
+        void Set(Point3D? position = null, double? potential = null, double? output = null, double? lastoutput = null, double? r = null, double? c = null, double? restpotential = null);
+        void ReSet(double startT = 0.0);
+        void InjectedFrom(ICurrentSource currentsource);
+        Dictionary<Guid, ICurrentSource> CurrentSources { get; }
+        double InjectedCurrents(double currentT);
+        double SynapseCurrents(double deltaT, double currentT);
     }
 
 

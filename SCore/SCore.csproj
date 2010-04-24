@@ -74,7 +74,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArtificialNeuron.cs" />
+    <Compile Include="CurrentSource.cs" />
     <Compile Include="ICompartment.cs" />
+    <Compile Include="ICurrentSource.cs" />
     <Compile Include="MC.cs" />
     <Compile Include="HH.cs" />
     <Compile Include="IChannal.cs" />
@@ -90,10 +93,12 @@
     <Compile Include="Network.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helper.cs" />
+    <Compile Include="Random.cs" />
     <Compile Include="Recorder.cs" />
     <Compile Include="GlobleSettings.cs" />
     <Compile Include="Simulator.cs" />
     <Compile Include="SpikeWeightSynapse.cs" />
+    <Compile Include="SQLRecorder.cs" />
     <Compile Include="ThresholdSpike.cs" />
     <Compile Include="ThresholdHeaviside.cs" />
     <Compile Include="ThresholdSigmoid.cs" />

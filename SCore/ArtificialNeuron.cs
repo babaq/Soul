@@ -15,20 +15,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
-using SCore;
+using SSolver;
 
-namespace Soul
+namespace SCore
 {
-    public interface ICellNet
+    public class AMP:MP
     {
-        INetwork Network { get; set; }
-        ModelVisual3D Mophology { get; set; }
-        Dictionary<Guid, ICell> Cells { get; }
-        Dictionary<Guid, ICellNet> ChildCellNet { get; }
-        bool IsPushing { get; set; }
-        Point3D Position { get; set; }
-        RotateTransform3D Rotate { get; set; }
-        TranslateTransform3D Translate { get; set; }
-        ScaleTransform3D Scale { get; set; }
+        public AMP(string name, Point3D position,double initpotential)
+            : base(name, position, new ThresholdHeaviside(null, 0.5), initpotential, 0.0)
+        {
+        }
+
+
+        public override void Update(double deltaT, double currentT, ISolver solver)
+        {
+            base.Update(deltaT, currentT, solver);
+        }
+
+        public override object Clone()
+        {
+            return base.Clone();
+        }
+
     }
 }

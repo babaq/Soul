@@ -16,89 +16,38 @@ using System.Linq;
 using System.Text;
 using SSolver;
 using System.Windows.Media.Media3D;
+using System.Reflection;
 
 namespace SCore
 {
-    /// <summary>
-    /// Generate Gaussian Random Number Using Polar Form of Box-Muller Transformation
-    /// </summary>
-    public static class GaussRandom
-    {
-        private static Random uniformrandom;
-        private static double gn;
-        private static int ign;
-
-
-        static GaussRandom()
-        {
-            uniformrandom = new Random();
-            ign = 0;
-        }
-
-
-        /// <summary>
-        /// Gets Standard Gaussian Distribution Number (0, 1)
-        /// </summary>
-        /// <returns></returns>
-        public static double Sample()
-        {
-            double un1, un2, sqw, w;
-            if (ign == 0)
-            {
-                do
-                {
-                    un1 = 2.0 * uniformrandom.NextDouble() - 1.0;
-                    un2 = 2.0 * uniformrandom.NextDouble() - 1.0;
-                    w = un1 * un1 + un2 * un2;
-                } while (w >= 1.0 || w == 0.0);
-
-                sqw = Math.Sqrt((-2.0 * Math.Log(w) )/ w);
-                gn = un2 * sqw;
-                ign = 1;
-                return un1 * sqw;
-            }
-            else
-            {
-                ign = 0;
-                return gn;
-            }
-        }
-
-        /// <summary>
-        /// Gets Custom Gaussian Distribution Number (mean, sd)
-        /// </summary>
-        /// <param name="mean"></param>
-        /// <param name="sd"></param>
-        /// <returns></returns>
-        public static double Next(double mean,double sd)
-        {
-            return CoreFunc.gGuassRandom(Sample(), mean, sd);
-        }
-
-    }
-
-    public static class Projection
-    {
-        public static void From_To(INeuron neuron, INetwork network)
-        {
-            
-        }
-
-        public static void From_To(INetwork network, INeuron neuron)
-        {
-            
-        }
-
-        public static void From_To(INetwork sourcenetwork, INetwork targetnetwork)
-        {
-            
-        }
-
-    }
-
     public static class Proliferation
     {
-        public static INetwork Division(Point3D dimension,Point3D dimensionscale, NeuronType neurontype)
+        public static INetwork Division(Point3D dimension, NeuronType neurontype, params Tuple<string, Randomizer>[] targets)
+        {
+            var network = Division(dimension, null, neurontype);
+            network.Randomize(targets: targets);
+            return network;
+        }
+
+        public static INetwork Division(Point3D dimension, Vector3D? neurondistance, NeuronType neurontype, double threshold = -50, double initpotential = -60, double restpotential = -60, double r = 5, double c = 2, double resetpotential = -60, double refractoryperiod = 1)
+        {
+            INeuron neuron = null;
+            switch (neurontype)
+            {
+                case NeuronType.MP:
+                    neuron = new MP(threshold, initpotential);
+                    break;
+                case NeuronType.LI:
+                    neuron = new LI(threshold, initpotential, r, c, restpotential);
+                    break;
+                case NeuronType.IF:
+                    neuron = new IF(threshold, resetpotential, refractoryperiod, initpotential, r, c, restpotential);
+                    break;
+            }
+            return Division(neuron, dimension, neurondistance);
+        }
+
+        public static INetwork Division(INeuron neuron, Point3D dimension, Vector3D? neurondistance)
         {
             var network = new Network();
             for (var i = 0; i < dimension.X; i++)
@@ -107,25 +56,122 @@ namespace SCore
                 {
                     for (var k = 0; k < dimension.Z; k++)
                     {
-                        var x = i*dimensionscale.X;
-                        var y = j*dimensionscale.Y;
-                        var z = k*dimensionscale.Z;
-                        switch (neurontype)
-                        {
-                            case NeuronType.MP:
-                                new MP(0.5, 1.0) { ParentNetwork = network, Position = new Point3D(x,y,z) };
-                                break;
-                            case NeuronType.LI:
-                                new LI(-50, -60, 5, 2, -60) { ParentNetwork = network,Position = new Point3D(x,y,z)};
-                                break;
-                        }
+                        var child = neuron.Clone() as INeuron;
+                        child.ParentNetwork = network;
                     }
                 }
             }
+            network.ReShape(dimension, neurondistance);
             return network;
         }
 
+        public static INetwork Division(INeuron neuron, Point3D dimension, string property, Randomizer randomizer)
+        {
+            var network = Division(neuron, dimension, null);
+            network.Randomize(property, randomizer);
+            return network;
+        }
     }
+
+    public static class Projection
+    {
+        public static void From_To(INeuron neuron, INetwork network,Projector projector)
+        {
+            if (neuron != null && network.Dimension != null)
+            {
+
+            }
+        }
+
+        public static void From_To(INetwork network, INeuron neuron,double probability = 1.0)
+        {
+
+        }
+
+        public static void From_To(INetwork sourcenetwork, INetwork targetnetwork, SynapseType synapsetype, double weight, double axondelay, ProjectionType projectiontype = ProjectionType.AllToAll, double probability = 1.0)
+        {
+            ISynapse synapse = null;
+            switch (synapsetype)
+            {
+                case SynapseType.WeightSynapse:
+                    synapse = new WeightSynapse(null, weight);
+                    break;
+                case SynapseType.SpikeWeightSynapse:
+                    synapse = new SpikeWeightSynapse(null, weight, axondelay);
+                    break;
+            }
+            From_To(sourcenetwork, targetnetwork, synapse, projectiontype, probability);
+
+        }
+
+        public static void From_To(INetwork sourcenetwork, INetwork targetnetwork, ISynapse synapse, ProjectionType projectiontype, double probability)
+        {
+            if (sourcenetwork.Neurons.Count > 0 && targetnetwork.Neurons.Count > 0)
+            {
+                switch (projectiontype)
+                {
+                    case ProjectionType.AllToAll:
+                        for (var i = 0; i < sourcenetwork.Neurons.Count; i++)
+                        {
+                            for (var j = 0; j < targetnetwork.Neurons.Count; j++)
+                            {
+                                if (Projector.IsProjectionSucceed(probability))
+                                {
+                                    var source = sourcenetwork.Neurons.ElementAt(i).Value;
+                                    var target = targetnetwork.Neurons.ElementAt(j).Value;
+                                    var newsynapse = synapse.Clone() as ISynapse;
+                                    newsynapse.PreSynapticNeuron = source;
+                                    source.ProjectTo(target, newsynapse);
+                                }
+                            }
+                        }
+                        break;
+                    case ProjectionType.OneToOne:
+                        var both = Math.Min(sourcenetwork.Neurons.Count, targetnetwork.Neurons.Count);
+                        for (var i = 0; i < both; i++)
+                        {
+                            if (Projector.IsProjectionSucceed(probability))
+                            {
+                                var source = sourcenetwork.Neurons.ElementAt(i).Value;
+                                var target = targetnetwork.Neurons.ElementAt(i).Value;
+                                var newsynapse = synapse.Clone() as ISynapse;
+                                newsynapse.PreSynapticNeuron = source;
+                                source.ProjectTo(target, newsynapse);
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+
+    }
+
+    public class Projector
+    {
+        private static Random uniformrandom=new Random();
+
+        public void ProjectTo(INeuron neuron, INetwork network)
+        {
+        }
+
+        public static bool IsProjectionSucceed(double probability)
+        {
+            var urn = uniformrandom.NextDouble();
+            if (urn <= probability)
+            {
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public enum ProjectionType
+    {
+        OneToOne,
+        AllToAll
+    }
+
+    
 
 }
 

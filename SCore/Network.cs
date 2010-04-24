@@ -18,6 +18,8 @@ using System.Text;
 using System.Windows.Media.Media3D;
 using SSolver;
 using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Reflection;
 
 namespace SCore
 {
@@ -27,12 +29,15 @@ namespace SCore
         private Guid id;
         private string name;
         private Point3D position;
+        private INeuron[, ,] dimensionneurons;
         private Dictionary<Guid, INeuron> neurons;
-        private Dictionary<Guid,INetwork> childnetworks;
+        private Dictionary<Guid, INetwork> childnetworks;
         private INetwork parentnetwork;
+        private Point3D? dimension;
 
 
-        public Network():this("Network",new Point3D())
+        public Network()
+            : this("Network", new Point3D())
         {
         }
 
@@ -42,8 +47,10 @@ namespace SCore
             this.name = name;
             this.position = position;
             neurons = new Dictionary<Guid, INeuron>();
-            childnetworks = new  Dictionary<Guid, INetwork>();
+            dimensionneurons = null;
+            childnetworks = new Dictionary<Guid, INetwork>();
             parentnetwork = null;
+            dimension = null;
         }
 
 
@@ -51,24 +58,33 @@ namespace SCore
 
         public Guid ID
         {
-            get{return id;}
+            get { return id; }
         }
 
         public string Name
         {
-            get{return name;}
-            set{name = value;}
+            get { return name; }
+            set { name = value; }
         }
 
         public Point3D Position
         {
-            get{return position;}
-            set{position = value;}
+            get { return position; }
+            set
+            {
+                position = value;
+                NotifyPropertyChanged("Position");
+            }
         }
 
-        public Dictionary<Guid,INeuron> Neurons
+        public Dictionary<Guid, INeuron> Neurons
         {
             get { return neurons; }
+        }
+
+        public INeuron[, ,] DimensionNeurons
+        {
+            get { return dimensionneurons; }
         }
 
         public Dictionary<Guid, INetwork> ChildNetworks
@@ -235,6 +251,7 @@ namespace SCore
                 s.AppendLine("# Network Summary.");
                 s.AppendLine("# ID=" + id.ToString("N"));
                 s.AppendLine("# Name=" + name);
+                s.AppendLine("# Position=" + position);
                 s.AppendLine("# NumberOfNeuron=" + neurons.Count);
                 if (neurons.Count > 0)
                 {
@@ -263,9 +280,133 @@ namespace SCore
             }
         }
 
-        public INetwork CreateInstance()
+        public void Set(bool isincludechildnetwork = false, Point3D? position = null, double? potential = null, double? output = null, double? lastoutput = null, double? r = null, double? c = null, double? restpotential = null)
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < neurons.Count; i++)
+            {
+                neurons.ElementAt(i).Value.Set(position, potential, output, lastoutput, r, c, restpotential);
+            }
+            if (isincludechildnetwork)
+            {
+                for (int i = 0; i < childnetworks.Count; i++)
+                {
+                    childnetworks.ElementAt(i).Value.Set(isincludechildnetwork, position, potential, output, lastoutput, r, c, restpotential);
+                }
+            }
+        }
+
+        public Nullable<Point3D> Dimension
+        {
+            get { return dimension; }
+        }
+
+        public void ReShape(Point3D newdimension, Vector3D? neurondistance = null, bool isincludechildnetwork = false)
+        {
+            var dx = (int)Math.Max(1, newdimension.X);
+            var dy = (int)Math.Max(1, newdimension.Y);
+            var dz = (int)Math.Max(1, newdimension.Z);
+            if (dx * dy * dz == Neurons.Count)
+            {
+                dimensionneurons = new INeuron[dx, dy, dz];
+                Vector3D ND = GlobleSettings.NeuronDistance;
+                if (neurondistance.HasValue)
+                {
+                    ND = neurondistance.Value;
+                }
+                for (var i = 0; i < dx; i++)
+                {
+                    for (var j = 0; j < dy; j++)
+                    {
+                        for (var k = 0; k < dz; k++)
+                        {
+                            var x = (i - dx / 2.0) * ND.X;
+                            var y = (j - dy / 2.0) * ND.Y;
+                            var z = (k - dz / 2.0) * ND.Z;
+                            var neuron = neurons.ElementAt(i * dy * dz + j * dz + k).Value;
+                            neuron.Position = new Point3D(x, y, z);
+                            dimensionneurons[i, j, k] = neuron;
+                        }
+                    }
+                }
+                dimension = new Point3D(dx, dy, dz);
+            }
+            if (isincludechildnetwork)
+            {
+                for (int i = 0; i < childnetworks.Count; i++)
+                {
+                    childnetworks.ElementAt(i).Value.ReShape(newdimension, neurondistance, isincludechildnetwork);
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void NotifyPropertyChanged(string propertyname)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyname));
+            }
+        }
+
+        public void ReSet(double startT = 0.0, bool isincludechildnetwork = true)
+        {
+            for (int i = 0; i < neurons.Count; i++)
+            {
+                neurons.ElementAt(i).Value.ReSet(startT);
+            }
+            if (isincludechildnetwork)
+            {
+                for (int i = 0; i < childnetworks.Count; i++)
+                {
+                    childnetworks.ElementAt(i).Value.ReSet(startT, isincludechildnetwork);
+                }
+            }
+        }
+
+        #endregion
+
+        #region IRandomizable Members
+
+        public void Randomize(bool isincludechildnetwork = false, params Tuple<string, Randomizer>[] targets)
+        {
+            for (var i = 0; i < targets.Length; i++)
+            {
+                Randomize(targets[i].Item1, targets[i].Item2, isincludechildnetwork);
+            }
+        }
+
+        public void Randomize(string property, Randomizer randomizer, bool isincludechildnetwork = false)
+        {
+            PropertyInfo propertyinfo;
+            try
+            {
+                propertyinfo = typeof(INeuron).GetProperty(property);
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    propertyinfo = typeof(IHillock).GetProperty(property);
+                }
+                catch (Exception ee)
+                {
+                    return;
+                }
+            }
+
+            if (dimensionneurons != null)
+            {
+                randomizer.Randomize(dimensionneurons, propertyinfo);
+            }
+
+            if (isincludechildnetwork)
+            {
+                for (int i = 0; i < childnetworks.Count; i++)
+                {
+                    childnetworks.ElementAt(i).Value.Randomize(property, randomizer, isincludechildnetwork);
+                }
+            }
         }
 
         #endregion

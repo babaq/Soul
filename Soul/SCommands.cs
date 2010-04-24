@@ -61,6 +61,12 @@ namespace Soul
         {
             get { return isimaging; }
         }
+
+        static RoutedUICommand reset = new RoutedUICommand("ReSet", "ReSet", typeof(SCommands));
+        public static RoutedUICommand ReSet
+        {
+            get { return reset; }
+        }
     }
 
 }

@@ -15,20 +15,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
-using SCore;
 
-namespace Soul
+namespace SCore
 {
-    public interface ICellNet
+    public interface ICurrentSource
     {
-        INetwork Network { get; set; }
-        ModelVisual3D Mophology { get; set; }
-        Dictionary<Guid, ICell> Cells { get; }
-        Dictionary<Guid, ICellNet> ChildCellNet { get; }
-        bool IsPushing { get; set; }
-        Point3D Position { get; set; }
-        RotateTransform3D Rotate { get; set; }
-        TranslateTransform3D Translate { get; set; }
-        ScaleTransform3D Scale { get; set; }
+        Guid ID { get; }
+        string Name { set; get; }
+        Point3D Position { set; get; }
+        void InjectTo(INeuron neuron);
+        double Flow(double currentT);
     }
 }

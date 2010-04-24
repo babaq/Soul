@@ -61,22 +61,21 @@ namespace SCoreTest01
         static void InitLI()
         {
             var Es = new List<LI>();
-
-            for (int i = 0; i < 100; i++)
+            int N = 100;
+            for (int i = 0; i < N; i++)
             {
-                Es.Add(new LI(-50, -60, 2, 5, -60) { ParentNetwork = network });
+                Es.Add(new LI("LI:" + (i + 1), -50, -60, 10, 1, -60) { ParentNetwork = network, Position = new Point3D(-100 + (i * 2), 0, 0) });
             }
-            var I = new LI(-50, -60, 2, 5, -60) { ParentNetwork = network };
-            var Es_Input = new LI(-50, 50, 2, 5, 50) { ParentNetwork = network };
+            var I = new LI("LI:" + (N + 1), -50, -60, 10, 1, -60) { ParentNetwork = network, Position = new Point3D(0, -10, 0) };
+            var Es_Input = new LI("LI:" + (N + 2), -50, 1, 10, 1, 1) { ParentNetwork = network, Position = new Point3D(0, 10, 0) };
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < N; i++)
             {
-                for (int j = -5; j < 5; j++)
+                for (int j = 0; j < N; j++)
                 {
-                    var ind = i + j;
-                    if (ind >= 0 && ind < 100 && i != ind)
+                    if (i != j)
                     {
-                        Es[i].ProjectedFrom(Es[ind], new WeightSynapse(Es[ind], 10 * CoreFunc.Gauss((j + 5), 10, 3)));
+                        Es[i].ProjectedFrom(Es[j], new WeightSynapse(Es[j], 10 * CoreFunc.Gauss((j - i), 0, 3)));
                     }
                 }
 
@@ -89,18 +88,18 @@ namespace SCoreTest01
             for (int i = 45; i < 55; i++)
             {
 
-                Es[i].ProjectedFrom(Es_Input, new WeightSynapse(Es_Input, 10 * CoreFunc.Gauss((i - 45), 10, 3)));
+                Es[i].ProjectedFrom(Es_Input, new WeightSynapse(Es_Input, 10 * CoreFunc.Gauss(i, 49.5, 3)));
             }
 
             for (int i = 10; i < 20; i++)
             {
 
-                Es[i].ProjectedFrom(Es_Input, new WeightSynapse(Es_Input, 10 * CoreFunc.Gauss((i - 10), 10, 3)));
+                Es[i].ProjectedFrom(Es_Input, new WeightSynapse(Es_Input, 10 * CoreFunc.Gauss(i, 14.5, 3)));
 
             }
             for (int i = 85; i < 95; i++)
             {
-                Es[i].ProjectedFrom(Es_Input, new WeightSynapse(Es_Input, 10 * CoreFunc.Gauss((i - 85), 10, 3)));
+                Es[i].ProjectedFrom(Es_Input, new WeightSynapse(Es_Input, 10 * CoreFunc.Gauss(i, 89.5, 3)));
             }
         }
 
@@ -117,50 +116,47 @@ namespace SCoreTest01
             //{
             //    EsInput_spiketime.Add(i * 0.5);
             //}  
-            int N = 10;
-            int W = 4;
+            int N = 100;
             for (int i = 0; i < N; i++)
             {
-                Es.Add(new IF("IF:" + (i + 1), -55, -60.1, 1, -56, 10, 1, -60) { ParentNetwork = network,Position = new Point3D(-10+(i*2),0,0)});
+                Es.Add(new IF("IF:" + (i + 1), -50, -60.1, 1, -56, 10, 1, -60) { ParentNetwork = network, Position = new Point3D(-100 + (i * 2), 0, 0) });
             }
 
-            var I = new IF("IF:" + (N + 1), -50, -60.1, 1, -56, 10, 1, -60) { ParentNetwork = network,Position = new Point3D(0,-3,0)};
+            var I = new IF("IF:" + (N + 1), -50, -60.1, 1, -56, 10, 1, -60) { ParentNetwork = network, Position = new Point3D(0, -10, 0) };
 
-            var Es_Input = new IF("IF:" + (N + 2), -50, 50, 0.05, 50, 2, 5, 50) { ParentNetwork = network,Position = new Point3D(0,3,0)};
+            var Es_Input = new IF("IF:" + (N + 2), -50, 1, 0.05, 10, 1, 1, 1) { ParentNetwork = network, Position = new Point3D(0, 10, 0) };
 
             for (int i = 0; i < N; i++)
             {
-                for (int j = -W / 2; j < W / 2 + 1; j++)
+                for (int j = 0; j < N; j++)
                 {
-                    var ind = i + j;
-                    if (ind >= 0 && ind < N && i != ind)
+                    if (i != j)
                     {
-                        Es[i].ProjectedFrom(Es[ind], new SpikeWeightSynapse(Es[ind], 1000 * CoreFunc.Gauss((j + 1), 3, 3), 2));
+                        Es[i].ProjectedFrom(Es[j], new SpikeWeightSynapse(Es[j], 10 * CoreFunc.Gauss((j - i), 0, 3), 1));
                     }
-
                 }
 
-                Es[i].ProjectedFrom(I, new SpikeWeightSynapse(I, -5, 2));
-                Es[i].ProjectTo(I, new SpikeWeightSynapse(Es[i], 2000, 2));
+                Es[i].ProjectedFrom(I, new SpikeWeightSynapse(I, -5, 1));
+                Es[i].ProjectTo(I, new SpikeWeightSynapse(Es[i], 2, 1));
                 //Es_Input.ProjectTo(I, new WeightSynapse(I, -0.2,0.1));
             }
-            for (int i = 3; i < 7; i++)
+            for (int i = 45; i < 55; i++)
             {
 
-                Es[i].ProjectedFrom(Es_Input, new SpikeWeightSynapse(Es_Input, 1000 * CoreFunc.Gauss((i - 4.5),0, 3), 0.5));
+                Es[i].ProjectedFrom(Es_Input, new SpikeWeightSynapse(Es_Input, 10 * CoreFunc.Gauss(i, 49.5, 3), 0.5));
             }
 
-            //for (int i = 5; i < 15; i++)
-            //{
+            for (int i = 5; i < 15; i++)
+            {
 
-            //    Es[i].ProjectedFrom(Es_Input, new SpikeWeightSynapse(Es_Input, 100 * CoreFunc.Gauss((i - 10), W, 3)));
+                Es[i].ProjectedFrom(Es_Input, new SpikeWeightSynapse(Es_Input, 10 * CoreFunc.Gauss(i, 9.5, 3), 0.5));
 
-            //}
-            //for (int i = 85; i < 95; i++)
-            //{
+            }
+            for (int i = 85; i < 95; i++)
+            {
 
-            //    Es[i].ProjectedFrom(Es_Input, new SpikeWeightSynapse(Es_Input, 100 * CoreFunc.Gauss((i - 85), W, 3)));
-            //}
+                Es[i].ProjectedFrom(Es_Input, new SpikeWeightSynapse(Es_Input, 10 * CoreFunc.Gauss(i, 89.5, 3), 0.5));
+            }
         }
 
         static void InitHH()
