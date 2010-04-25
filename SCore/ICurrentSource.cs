@@ -15,15 +15,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
+using System.ComponentModel;
+using SSolver;
 
 namespace SCore
 {
-    public interface ICurrentSource
+    public interface ICurrentSource : INotifyPropertyChanged
     {
         Guid ID { get; }
         string Name { set; get; }
         Point3D Position { set; get; }
         void InjectTo(INeuron neuron);
         double Flow(double currentT);
+        bool ON { get; set; }
+        double Amplitude { get; set; }
+        void NotifyPropertyChanged(string propertyname);
+        TimeFunc TimeFunc { get; set; }
+        double[] TimeFuncParams { get; set; }
+        RNG Random { get; set; }
+        double[] RandomParams { get; set; }
     }
 }

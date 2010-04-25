@@ -75,7 +75,7 @@ namespace SCore
 
     public static class Projection
     {
-        public static void From_To(INeuron neuron, INetwork network,Projector projector)
+        public static void From_To(INeuron neuron, INetwork network, Projector projector)
         {
             if (neuron != null && network.Dimension != null)
             {
@@ -83,7 +83,7 @@ namespace SCore
             }
         }
 
-        public static void From_To(INetwork network, INeuron neuron,double probability = 1.0)
+        public static void From_To(INetwork network, INeuron neuron, double probability = 1.0)
         {
 
         }
@@ -146,32 +146,8 @@ namespace SCore
 
     }
 
-    public class Projector
+    public static class Injection
     {
-        private static Random uniformrandom=new Random();
-
-        public void ProjectTo(INeuron neuron, INetwork network)
-        {
-        }
-
-        public static bool IsProjectionSucceed(double probability)
-        {
-            var urn = uniformrandom.NextDouble();
-            if (urn <= probability)
-            {
-                return true;
-            }
-            return false;
-        }
     }
-
-    public enum ProjectionType
-    {
-        OneToOne,
-        AllToAll
-    }
-
-    
-
 }
 

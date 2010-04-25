@@ -15,6 +15,12 @@ module SSolver.CoreFunc
 open System
 
 /// <summary>
+/// Time Dependent Sine Function
+/// </summary>
+let TFSine (freq_phase: seq<float>) t = 
+    Math.Sin(2.0*Math.PI*(Seq.nth 0 freq_phase) * t + Seq.nth 1 freq_phase)
+
+/// <summary>
 /// Gaussian Function
 /// </summary>
 let Gauss x u d =

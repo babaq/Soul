@@ -145,42 +145,54 @@ namespace SCore
 
         public void Update(double deltaT, double currentT, ISolver solver)
         {
-            Parallel.For(0, neurons.Count, (i) =>
+            if (GlobleSettings.IsRunInParallel)
             {
-                neurons.ElementAt(i).Value.Update(deltaT, currentT, solver);
-            });
-            Parallel.For(0, childnetworks.Count, (i) =>
+                Parallel.For(0, neurons.Count, (i) =>
+                {
+                    neurons.ElementAt(i).Value.Update(deltaT, currentT, solver);
+                });
+                Parallel.For(0, childnetworks.Count, (i) =>
+                {
+                    childnetworks.ElementAt(i).Value.Update(deltaT, currentT, solver);
+                });
+            }
+            else
             {
-                childnetworks.ElementAt(i).Value.Update(deltaT, currentT, solver);
-            });
-            //for (int i = 0; i < neurons.Count; i++)
-            //{
-            //    neurons.ElementAt(i).Value.Update(deltaT, currentT, solver);
-            //}
-            //for (int i = 0; i < childnetworks.Count; i++)
-            //{
-            //    childnetworks.ElementAt(i).Value.Update(deltaT, currentT, solver);
-            //}
+                for (int i = 0; i < neurons.Count; i++)
+                {
+                    neurons.ElementAt(i).Value.Update(deltaT, currentT, solver);
+                }
+                for (int i = 0; i < childnetworks.Count; i++)
+                {
+                    childnetworks.ElementAt(i).Value.Update(deltaT, currentT, solver);
+                }
+            }
         }
 
         public void Tick(double currentT)
         {
-            Parallel.For(0, neurons.Count, (i) =>
+            if (GlobleSettings.IsRunInParallel)
             {
-                neurons.ElementAt(i).Value.Tick(currentT);
-            });
-            Parallel.For(0, childnetworks.Count, (i) =>
+                Parallel.For(0, neurons.Count, (i) =>
+                {
+                    neurons.ElementAt(i).Value.Tick(currentT);
+                });
+                Parallel.For(0, childnetworks.Count, (i) =>
+                {
+                    childnetworks.ElementAt(i).Value.Tick(currentT);
+                });
+            }
+            else
             {
-                childnetworks.ElementAt(i).Value.Tick(currentT);
-            });
-            //for (int i = 0; i < neurons.Count; i++)
-            //{
-            //    neurons.ElementAt(i).Value.Tick(currentT);
-            //}
-            //for (int i = 0; i < childnetworks.Count; i++)
-            //{
-            //    childnetworks.ElementAt(i).Value.Tick(currentT);
-            //}
+                for (int i = 0; i < neurons.Count; i++)
+                {
+                    neurons.ElementAt(i).Value.Tick(currentT);
+                }
+                for (int i = 0; i < childnetworks.Count; i++)
+                {
+                    childnetworks.ElementAt(i).Value.Tick(currentT);
+                }
+            }
         }
 
         public void RegisterUpdated(EventHandler onoutput)

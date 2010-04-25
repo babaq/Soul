@@ -15,6 +15,11 @@ namespace SSolver
 open System
 
 /// <summary>
+/// Time Dependent Function Delegate
+/// </summary>
+type TimeFunc = delegate of float * seq<float> -> float
+
+/// <summary>
 /// Differential Equation Solver Type
 /// </summary>
 type SolverType =

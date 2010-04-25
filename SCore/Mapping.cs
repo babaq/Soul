@@ -14,29 +14,36 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Windows.Media.Media3D;
-using SSolver;
 
 namespace SCore
 {
-    public class AMP : MP
+    public class Projector
     {
-        public AMP(string name, Point3D position, double initpotential)
-            : base(name, position, new ThresholdHeaviside(null, 0.5), initpotential, 0.0)
+        private static Random uniformrandom = new Random();
+
+        public void ProjectTo(INeuron neuron, INetwork network)
         {
         }
 
-
-        public override void Update(double deltaT, double currentT, ISolver solver)
+        public static bool IsProjectionSucceed(double probability)
         {
-            base.Update(deltaT, currentT, solver);
+            var urn = uniformrandom.NextDouble();
+            if (urn <= probability)
+            {
+                return true;
+            }
+            return false;
         }
+    }
 
-        public override object Clone()
-        {
-            return base.Clone();
-        }
+    public class Injector
+    {
+    }
 
+    public enum ProjectionType
+    {
+        OneToOne,
+        AllToAll
     }
 
 }

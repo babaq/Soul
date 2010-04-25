@@ -33,7 +33,7 @@ namespace SCore
         double mean, std;
 
 
-        public Randomizer(RNG randomsource,int dimxbegin=0,int dimxend=0,int dimybegin=0,int dimyend=0,int dimzbegin=0,int dimzend=0,double mean=0.5,double std=0.5)
+        public Randomizer(RNG randomsource, int dimxbegin = 0, int dimxend = 0, int dimybegin = 0, int dimyend = 0, int dimzbegin = 0, int dimzend = 0, double mean = 0.5, double std = 0.5)
         {
             this.randomsource = randomsource;
             this.dimxbegin = dimxbegin;
@@ -54,7 +54,7 @@ namespace SCore
                 PrepareDimensionRange(dimensionelements.GetLength(0), dimensionelements.GetLength(1), dimensionelements.GetLength(2));
                 try
                 {
-                    bool isneedconvert=propertyinfo.PropertyType!=typeof(double);
+                    bool isneedconvert = propertyinfo.PropertyType != typeof(double);
                     for (var i = dimxbegin; i <= dimxend; i++)
                     {
                         for (var j = dimybegin; j <= dimyend; j++)
@@ -62,12 +62,12 @@ namespace SCore
                             for (var k = dimzbegin; k <= dimzend; k++)
                             {
                                 var randomvalue = randomsource.NextMeanStdDouble(mean, std);
-                                propertyinfo.SetValue(dimensionelements[i, j, k], Convert(isneedconvert,randomvalue,propertyinfo.PropertyType), null);
+                                propertyinfo.SetValue(dimensionelements[i, j, k], Convert(isneedconvert, randomvalue, propertyinfo.PropertyType), null);
                             }
                         }
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                 }
             }
@@ -95,13 +95,13 @@ namespace SCore
             }
         }
 
-        protected virtual object Convert(bool isconvert,double value,Type outtype)
+        protected virtual object Convert(bool isconvert, double value, Type outtype)
         {
             if (isconvert)
             {
-                if(outtype== typeof(Point3D))
+                if (outtype == typeof(Point3D))
                 {
-                    return new Point3D(value,randomsource.NextMeanStdDouble(mean,std),randomsource.NextMeanStdDouble(mean,std));
+                    return new Point3D(value, randomsource.NextMeanStdDouble(mean, std), randomsource.NextMeanStdDouble(mean, std));
                 }
             }
             return value;

@@ -105,17 +105,13 @@ namespace Soul
             MouseMove += WorkShop_MouseMove;
             MouseWheel += WorkShop_MouseWheel;
 
-            init();
-        }
 
 
-        void init()
-        {
             var n = new LI(-50, -48, 5, 2, -55);
-            var net0 = Proliferation.Division(n,new Point3D(1, 10, 10), "InitPotential",new Randomizer(new RNG(),dimyend:9,dimzend:9,mean:-50.0,std:5) );
+            var net0 = Proliferation.Division(n, new Point3D(1, 10, 10), "InitPotential", new Randomizer(new RNG(), dimyend: 9, dimzend: 9, mean: -50.0, std: 5));
             net0.ReSet();
             //net0.ReShape(new Point3D(2, 10, 5));
-            var net1 = Proliferation.Division(n, new Point3D(1, 10, 10), "InitPotential", new Randomizer(new RNG(), dimyend: 9, dimzend:9, mean: -50.0, std: 10));
+            var net1 = Proliferation.Division(n, new Point3D(1, 10, 10), "InitPotential", new Randomizer(new RNG(), dimyend: 9, dimzend: 9, mean: -50.0, std: 10));
             net1.ReSet();
             Projection.From_To(net0, net1, new WeightSynapse(null, 1), ProjectionType.OneToOne, 1.0);
             Projection.From_To(net0, net0, new WeightSynapse(null, -0.4), ProjectionType.AllToAll, 0.3);
@@ -126,39 +122,8 @@ namespace Soul
             net.ChildNetworks.Add(net1.ID, net1);
             LoadNetwork(net);
             CellNet.ChildCellNet[net0.ID].Position = new Point3D(-15, 0, 15);
-
-            //var li0 = new LI(-54, -55, 5, 2, -60) { ParentNetwork = simulator.Network };
-            //var li1 = new LI(-54, -55, 5, 5, -60);
-            //li0.ProjectTo(li1, new WeightSynapse(li0, 30.8));
-            //li0.ProjectedFrom(li1, new WeightSynapse(li1, 30.6));
-            //li0.ProjectTo(li0, new WeightSynapse(li0, -0.3));
-            //li1.ProjectTo(li1, new WeightSynapse(li1, -0.5));
-
-            //var cell0 = StemCell.Develop(li0);
-            //var cell1 = StemCell.Develop(li1);
-            //cell1.Position = new Point3D(2,0,0);
-
-            //ModelVisual.Children.Add(cell0.Mophology);
-            //ModelVisual.Children.Add(cell1.Mophology);
-
-            //var da = new DoubleAnimation();
-            //da.From = 0;
-            //da.To = 360;
-            ////var ra = new Rotation3DAnimation(new AxisAngleRotation3D(new Vector3D(0, 1, 0), 360), TimeSpan.FromSeconds(5));
-            ////ra.AutoReverse =true;
-            //da.RepeatBehavior = RepeatBehavior.Forever;
-            //da.Duration = TimeSpan.FromSeconds(5);
-            //var r = new AxisAngleRotation3D();
-            //r.Axis = new Vector3D(0, 1, 0);
-            //var tg = new Transform3DGroup();
-            //tg.Children.Add(r0);
-            //tg.Children.Add(new RotateTransform3D(r));
-            //cell1.Mophology.Transform = tg;
-            //r.BeginAnimation(AxisAngleRotation3D.AngleProperty, da);
-
-            //GlobleSettings.NeuronPotentialMin = -70.0;
-            //GlobleSettings.NeuronPotentialMax = -10.0;
         }
+
 
         public void LoadNetwork(INetwork network)
         {
@@ -172,8 +137,6 @@ namespace Soul
 
         void WorkShop_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            simulator.Network.Randomize("Position",new Randomizer(new RNG(),dimyend:9, dimzend:9,mean:0,std:10),true);
-            simulator.Network.ChildNetworks.ElementAt(0).Value.Position = new Point3D(40, 0, 0);
         }
 
         void WorkShop_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)

@@ -19,7 +19,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace SCore
 {
-    public class Recorder:IRecord
+    public class Recorder : IRecord
     {
         private ISimulation hostsimulator;
         private RecordType recordtype;
@@ -28,14 +28,15 @@ namespace SCore
         private FileStream spikefile;
         private StreamWriter potentialwriter;
         private StreamWriter spikewriter;
+        private readonly object lockobject = new object();
 
 
-        public Recorder(ISimulation hostsimulator, RecordType recordtype,string recordfile)
+        public Recorder(ISimulation hostsimulator, RecordType recordtype, string recordfile)
         {
             this.hostsimulator = hostsimulator;
             this.recordtype = recordtype;
             this.recordfile = recordfile;
-            potentialfile = spikefile  = null;
+            potentialfile = spikefile = null;
             potentialwriter = spikewriter = null;
         }
 
@@ -64,8 +65,8 @@ namespace SCore
         {
             if (recordtype != RecordType.None)
             {
-                var file=recordfile+hostsimulator.Network.Name + "_" + DateTime.Now.ToString("yyyy-MM-d_HH-mm-ss");
-                if(recordtype==RecordType.Potential || recordtype==RecordType.All)
+                var file = recordfile + hostsimulator.Network.Name + "_" + DateTime.Now.ToString("yyyy-MM-d_HH-mm-ss");
+                if (recordtype == RecordType.Potential || recordtype == RecordType.All)
                 {
                     potentialfile = new FileStream(file + "_v.txt", FileMode.Append, FileAccess.Write);
                     potentialwriter = new StreamWriter(potentialfile, Encoding.ASCII);
@@ -109,33 +110,39 @@ namespace SCore
 
         public virtual void RecordOnUpdated(object sender, EventArgs e)
         {
-            var neuron = sender as INeuron;
-            try
+            lock (lockobject)
             {
-                potentialwriter.WriteLine(hostsimulator.CurrentT.ToString("F3") + "\t" + neuron.Output.ToString("F3") + "\t" + neuron.ID.ToString("N"));
-            }
-            catch (Exception ex)
-            {
-                potentialwriter.WriteLine(ex.Message);
+                var neuron = sender as INeuron;
+                try
+                {
+                    potentialwriter.WriteLine(hostsimulator.CurrentT.ToString("F3") + "\t" + neuron.Output.ToString("F3") + "\t" + neuron.ID.ToString("N"));
+                }
+                catch (Exception ex)
+                {
+                    potentialwriter.WriteLine(ex.Message);
+                }
             }
         }
 
         public virtual void RecordOnSpike(object sender, EventArgs e)
         {
-            var neuron = sender as INeuron;
-            try
+            lock (lockobject)
             {
-                spikewriter.WriteLine(hostsimulator.CurrentT.ToString("F3") + "\t" + neuron.ID.ToString("N"));
-            }
-            catch (Exception ex)
-            {
-                spikewriter.WriteLine(ex.Message);
+                var neuron = sender as INeuron;
+                try
+                {
+                    spikewriter.WriteLine(hostsimulator.CurrentT.ToString("F3") + "\t" + neuron.ID.ToString("N"));
+                }
+                catch (Exception ex)
+                {
+                    spikewriter.WriteLine(ex.Message);
+                }
             }
         }
 
         public void Save(INetwork network, string file)
         {
-            var ext = file.Substring(file.LastIndexOf(".")+1);
+            var ext = file.Substring(file.LastIndexOf(".") + 1);
             switch (ext)
             {
                 case "network":
@@ -153,7 +160,7 @@ namespace SCore
         public INetwork Open(string file)
         {
             var ext = file.Substring(file.LastIndexOf(".") + 1);
-            INetwork network=null;
+            INetwork network = null;
             switch (ext)
             {
                 case "network":

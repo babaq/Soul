@@ -28,6 +28,7 @@ namespace SCore
             get { return NeuronPotentialMax - NeuronPotentialMin; }
         }
         public static Vector3D NeuronDistance = new Vector3D(2.5, 2.5, 2.5);
+        public static bool IsRunInParallel = true;
     }
 
 }

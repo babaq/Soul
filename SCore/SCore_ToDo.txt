@@ -1,5 +1,4 @@
 ﻿helper.projection
-currentsource
 inputneuron
 network.serilize
 standard model

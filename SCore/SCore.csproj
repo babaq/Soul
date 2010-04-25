@@ -76,8 +76,10 @@
   <ItemGroup>
     <Compile Include="ArtificialNeuron.cs" />
     <Compile Include="CurrentSource.cs" />
+    <Compile Include="CurrentSourceArray.cs" />
     <Compile Include="ICompartment.cs" />
     <Compile Include="ICurrentSource.cs" />
+    <Compile Include="Mapping.cs" />
     <Compile Include="MC.cs" />
     <Compile Include="HH.cs" />
     <Compile Include="IChannal.cs" />
