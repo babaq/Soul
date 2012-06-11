@@ -1,9 +1,3 @@
-bin
-obj
-*.cachefile
-cachefile*.txt
 *.ini
-*.user
-*.cd
-*.log
-_ReSharper.*
+obj
+bin
