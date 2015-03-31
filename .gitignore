@@ -1,3 +1,6 @@
-*.ini
+# Windows
+desktop.ini
+
+# Visual Studio
 obj
 bin

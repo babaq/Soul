@@ -1,0 +1,166 @@
+﻿<Window x:Class="Soul.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Soul="clr-namespace:Soul"
+    Title="Soul" Height="600" Width="800" Background="Lavender" WindowStartupLocation="CenterScreen" Icon="Icons\Soul.ico">
+    
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Open" Executed="Open_Executed"/>
+        <CommandBinding Command="ApplicationCommands.Save" Executed="Save_Executed"/>
+        <CommandBinding Command="ApplicationCommands.Close" Executed="Close_Executed" />
+        <CommandBinding Command="ApplicationCommands.Help" Executed="Help_Executed"/>
+        
+        <CommandBinding Command="Soul:SCommands.Run" Executed="Run_Executed" CanExecute="Run_CanExecute"/>
+        <CommandBinding Command="Soul:SCommands.Stop" Executed="Stop_Executed"/>
+        <CommandBinding Command="Soul:SCommands.Step" Executed="Step_Executed" CanExecute="Step_CanExecute" />
+        <CommandBinding Command="Soul:SCommands.ReSet" Executed="ReSet_Executed" CanExecute="ReSet_CanExecute"/>
+        <CommandBinding Command="Soul:SCommands.IsReportProgress" Executed="IsReportProgress_Executed"/>
+        <CommandBinding Command="Soul:SCommands.IsImaging" Executed="IsImaging_Executed"/>
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Command="Soul:SCommands.Run" Key="F5"/>
+        <KeyBinding Command="Soul:SCommands.Step" Key="F6"/>
+    </Window.InputBindings>
+    
+    <Window.Resources>
+        <Image x:Key="newico" Source="Icons\new.ico"/>
+        <Image x:Key="openico" Source="Icons\open.ico"/>
+        <Image x:Key="saveico" Source="Icons\save.ico"/>
+        <Image x:Key="playico" Source="Icons\play.ico"/>
+        <Image x:Key="pauseico" Source="Icons\pause.ico"/>
+        <Image x:Key="stopico" Source="Icons\stop.ico"/>
+        <Image x:Key="stepico" Source="Icons\step.ico"/>
+        <Image x:Key="resetico" Source="Icons\reset.ico"/>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="28" />
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <Menu Name="MainMenu" Grid.Row="0" Grid.RowSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Lavender" IsMainMenu="True">
+            <MenuItem Header="File">
+                <MenuItem Header="New" Command="ApplicationCommands.New" >
+                    
+                </MenuItem>
+                <MenuItem Header="Open" Command="ApplicationCommands.Open">
+                    
+                </MenuItem>
+                <MenuItem Header="Save" Command="ApplicationCommands.Save">
+                    
+                </MenuItem>
+                <MenuItem Header="Save As" Command="ApplicationCommands.SaveAs">
+
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Recent Files">
+                    
+                </MenuItem> 
+                <Separator/>
+                <MenuItem Header="Exit" Command="ApplicationCommands.Close"  >
+                    
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="Edit">
+                
+            </MenuItem> 
+            <MenuItem Header="View">
+                <MenuItem Header="ToolBar">
+                    
+                </MenuItem>
+                <MenuItem Header="StatusBar">
+                    
+                </MenuItem>
+                <MenuItem Header="Full Screen">
+                    
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="Simulation" >
+                <MenuItem Header="Run\Pause" Command="Soul:SCommands.Run">
+                    
+                </MenuItem>
+                <MenuItem Header="Stop" Command="Soul:SCommands.Stop">
+
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Step" Command="Soul:SCommands.Step">
+
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="ReSet" Command="Soul:SCommands.ReSet">
+
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Report Progress" IsCheckable="True" IsChecked="True" Command="Soul:SCommands.IsReportProgress">
+                    
+                </MenuItem>
+                <MenuItem Header="Imaging" IsCheckable="True" IsChecked="True" Command="Soul:SCommands.IsImaging" >
+                    
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="Tools">
+                
+            </MenuItem>
+            <MenuItem Header="Analyze">
+
+            </MenuItem>
+            <MenuItem Header="Window">
+                
+            </MenuItem>
+            <MenuItem Header="Help">
+                <MenuItem Header="Help" Command="ApplicationCommands.Help">
+                    
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="About Soul" Click="About_Click">
+                    
+                </MenuItem> 
+            </MenuItem>
+        </Menu>
+        
+        <ToolBar Name="MainToolBar" Grid.Row="1" Grid.RowSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Lavender">
+            <Button ToolTip="New" Command="ApplicationCommands.New" Content="{StaticResource newico}">
+            </Button>
+            <Button ToolTip="Open" Command="ApplicationCommands.Open" Content="{StaticResource openico}">
+            </Button>
+            <Button ToolTip="Save" Command="ApplicationCommands.Save" Content="{StaticResource saveico}">
+            </Button>
+            <Separator/>
+            <Button x:Name="RunPause" Command="Soul:SCommands.Run" ToolTip="Run Simulation" Content="{StaticResource playico}">
+            </Button>
+            <Button x:Name="Stop" Command="Soul:SCommands.Stop" ToolTip="Stop Simulation" Content="{StaticResource stopico}">
+            </Button>
+            <Button x:Name="Step" Command="Soul:SCommands.Step" ToolTip="Step Simulation" Content="{StaticResource stepico}">
+            </Button>
+            <Separator/>
+            <Button x:Name="ReSet" Command="Soul:SCommands.ReSet" ToolTip="ReSet Simulation" Content="{StaticResource resetico}">
+            </Button>
+            <Separator/>
+        </ToolBar>
+        
+        <TabControl Name="MainTab" Grid.Row="2" Grid.RowSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <TabItem Header="WorkShop" Name="WorkShopTab">
+                <Soul:WorkShop x:Name="WorkShop" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+            </TabItem>
+            
+            <TabItem Header="Monitor" Name="MonitorTab">
+                
+            </TabItem>
+            
+            <TabItem Header="Analyze" Name="AnalyzeTab">
+                
+            </TabItem>
+            
+        </TabControl>
+        
+        <StatusBar Name="MainStatusBar" Grid.Row="3" Grid.RowSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Lavender">
+            <TextBlock Name="StatusText" HorizontalAlignment="Left">
+            Ready
+            </TextBlock>
+        </StatusBar>  
+        
+    </Grid>
+</Window>
